@@ -501,7 +501,7 @@ export const DEFENSES: Record<string, DefenseData> = {
   },
   "barbarian_king": {
     "id": "barbarian_king",
-    "name": "Barbarian King (Altar)",
+    "name": "Barbarian King",
     "type": "hero",
     "unlockedAtTH": 7,
     "hp": [
@@ -624,7 +624,7 @@ export const DEFENSES: Record<string, DefenseData> = {
   },
   "archer_queen": {
     "id": "archer_queen",
-    "name": "Archer Queen (Altar)",
+    "name": "Archer Queen",
     "type": "hero",
     "unlockedAtTH": 8,
     "hp": [
@@ -747,7 +747,7 @@ export const DEFENSES: Record<string, DefenseData> = {
   },
   "minion_prince": {
     "id": "minion_prince",
-    "name": "Minion Prince (Altar)",
+    "name": "Minion Prince",
     "type": "hero",
     "unlockedAtTH": 9,
     "hp": [
@@ -855,7 +855,7 @@ export const DEFENSES: Record<string, DefenseData> = {
   },
   "grand_warden": {
     "id": "grand_warden",
-    "name": "Grand Warden (Altar)",
+    "name": "Grand Warden",
     "type": "hero",
     "unlockedAtTH": 11,
     "hp": [
@@ -953,7 +953,7 @@ export const DEFENSES: Record<string, DefenseData> = {
   },
   "royal_champion": {
     "id": "royal_champion",
-    "name": "Royal Champion (Altar)",
+    "name": "Royal Champion",
     "type": "hero",
     "unlockedAtTH": 13,
     "hp": [
@@ -1021,7 +1021,7 @@ export const DEFENSES: Record<string, DefenseData> = {
   },
   "dragon_duke": {
     "id": "dragon_duke",
-    "name": "Dragon Duke (Altar)",
+    "name": "Dragon Duke",
     "type": "hero",
     "unlockedAtTH": 15,
     "hp": [
