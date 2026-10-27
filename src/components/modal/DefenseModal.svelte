@@ -186,7 +186,7 @@
                     />
                   {/each}
                   <span class="text-emerald-400 font-bold text-xs ml-1">
-                    💥 Destroyed entirely by Equipment! (0 Spells)
+                    💥 Destroyed entirely by Hero Equipment!
                   </span>
                 </div>
               {:else}

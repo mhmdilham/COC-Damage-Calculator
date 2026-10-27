@@ -257,12 +257,6 @@
                 size="md"
               />
             {/each}
-
-            {#if group.totalSpellSpace === 0}
-              <span class="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded ml-1">
-                0 Spell
-              </span>
-            {/if}
           </div>
 
           <!-- Target Buildings in this Combo (Uniform Square Tiles matching Clashify) -->
@@ -396,12 +390,6 @@
                     size="sm"
                   />
                 {/each}
-
-                {#if best.totalSpellSpace === 0}
-                  <span class="text-[9px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-1.5 py-0.5 rounded leading-none">
-                    0 Spell
-                  </span>
-                {/if}
               </div>
             {:else}
               <span class="text-[10px] text-slate-500 font-medium px-2 py-1 rounded bg-slate-900/60 border border-slate-800/80">
