@@ -80,7 +80,7 @@
           type="button"
           onclick={() => calcState.closeModal()}
           class="text-slate-400 hover:text-white p-1 rounded-lg transition-colors cursor-pointer text-base leading-none"
-          title="Tutup"
+          title="Close"
         >
           ✕
         </button>
@@ -122,12 +122,12 @@
                   {/if}
                   {#if defense.immune.includes('lightning_spell')}
                     <span class="text-[10px] text-amber-300 font-semibold bg-amber-500/10 border border-amber-500/20 px-1.5 py-0.5 rounded">
-                      Kebal Zap
+                      Zap Immune
                     </span>
                   {/if}
                   {#if defense.immune.includes('earthquake_spell')}
                     <span class="text-[10px] text-orange-300 font-semibold bg-orange-500/10 border border-orange-500/20 px-1.5 py-0.5 rounded">
-                      Kebal Quake
+                      Quake Immune
                     </span>
                   {/if}
                 </div>
@@ -158,7 +158,7 @@
             />
             <div class="flex justify-between text-[10px] text-slate-500 pt-1 font-semibold">
               <span>Lv 1</span>
-              <span>Geser untuk atur level</span>
+              <span>Slide to adjust level</span>
               <span class="flex items-center gap-0.5">
                 Lv {maxLevel}
                 {#if defense.superchargeLevel && maxLevel === defense.superchargeLevel}
@@ -177,7 +177,7 @@
             <div class="bg-[#24262d] border border-slate-800/90 rounded-xl p-3 flex items-center justify-center gap-3 transition-colors hover:border-slate-700">
               {#if combo.totalSpellSpace === 0}
                 <div class="text-emerald-400 font-bold text-xs flex items-center gap-1.5 py-1.5">
-                  <span>💥 Hancur murni dengan Hero Equipment! (0 Spell Slot)</span>
+                  <span>💥 Destroyed entirely by Hero Equipment! (0 Spell Slots)</span>
                 </div>
               {:else}
                 <!-- Spell Badges -->
@@ -205,20 +205,20 @@
 
                 <!-- Spell space badge on right -->
                 <span class="ml-2 text-[10px] bg-slate-900 border border-slate-700/60 text-slate-400 font-semibold px-2 py-1 rounded-md">
-                  {combo.totalSpellSpace} Slot
+                  {combo.totalSpellSpace} Slot{combo.totalSpellSpace > 1 ? 's' : ''}
                 </span>
               {/if}
             </div>
           {/each}
         {:else}
           <div class="bg-[#16171b] border border-slate-800 rounded-xl p-6 text-center text-xs text-slate-500 italic space-y-1">
-            <p>🛡️ Tidak dapat dihancurkan dengan setup spell saat ini.</p>
+            <p>🛡️ Cannot be destroyed with the current spell setup.</p>
             {#if defense.immune.includes('lightning_spell')}
-              <p class="text-[11px] text-amber-400 font-medium">Bangunan ini kebal Lightning/Zap (hanya mempan Earthquake & Hero Equipment).</p>
+              <p class="text-[11px] text-amber-400 font-medium">This building is immune to Lightning/Zap (only affected by Earthquake & Hero Equipment).</p>
             {:else if defense.immune.includes('earthquake_spell')}
-              <p class="text-[11px] text-orange-400 font-medium">Target ini kebal terhadap Earthquake.</p>
+              <p class="text-[11px] text-orange-400 font-medium">This target is immune to Earthquake.</p>
             {:else}
-              <p class="text-[11px] text-slate-600">Pastikan level spell tidak 0 atau aktifkan Hero Equipment.</p>
+              <p class="text-[11px] text-slate-600">Ensure spell level is greater than 0 or enable Hero Equipment.</p>
             {/if}
           </div>
         {/if}

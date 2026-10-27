@@ -51,7 +51,7 @@
           ? 'bg-orange-500 text-slate-950 shadow-md shadow-orange-500/20'
           : 'bg-[#181a20] border border-slate-800 text-slate-300 hover:bg-slate-800'}"
       >
-        Semua ({calcState.availableDefenses.length})
+        All ({calcState.availableDefenses.length})
       </button>
 
       <button
@@ -61,7 +61,7 @@
           ? 'bg-orange-500 text-slate-950 shadow-md shadow-orange-500/20'
           : 'bg-[#181a20] border border-slate-800 text-slate-300 hover:bg-slate-800'}"
       >
-        ⭐ Utama ({calcState.availableDefenses.filter((d) => KEY_DEFENSES.has(d.id)).length})
+        ⭐ Key Defenses ({calcState.availableDefenses.filter((d) => KEY_DEFENSES.has(d.id)).length})
       </button>
 
       <button
@@ -71,7 +71,7 @@
           ? 'bg-orange-500 text-slate-950 shadow-md shadow-orange-500/20'
           : 'bg-[#181a20] border border-slate-800 text-slate-300 hover:bg-slate-800'}"
       >
-        🛡️ Standar
+        🛡️ Standard
       </button>
 
       <button
@@ -81,20 +81,20 @@
           ? 'bg-orange-500 text-slate-950 shadow-md shadow-orange-500/20'
           : 'bg-[#181a20] border border-slate-800 text-slate-300 hover:bg-slate-800'}"
       >
-        👑 Hero
+        👑 Heroes
       </button>
     </div>
 
     <!-- Search Box -->
     <div class="relative w-full sm:w-56">
-      <label for="defense-search-input" class="sr-only">Cari nama bangunan</label>
+      <label for="defense-search-input" class="sr-only">Search building or hero name</label>
       <input
         id="defense-search-input"
         name="defense-search"
         type="search"
         autocomplete="off"
         bind:value={calcState.searchQuery}
-        placeholder="Cari nama bangunan..."
+        placeholder="Search building or hero..."
         class="w-full text-xs bg-[#181a20] border border-slate-800 rounded-xl px-3 py-2 text-slate-200 placeholder-slate-500 focus:outline-none focus:border-orange-500"
       />
       {#if calcState.searchQuery}
@@ -129,7 +129,7 @@
           {#if best}
             {#if best.totalSpellSpace === 0}
               <span class="text-[11px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-1 rounded-lg">
-                💥 0 Spell (Equipment)
+                💥 0 Spells (Equipment)
               </span>
             {:else}
               <div class="flex items-center gap-1.5 justify-center">
@@ -159,11 +159,11 @@
           {:else}
             {#if def.immune.includes('lightning_spell')}
               <span class="text-[10px] text-amber-400 font-semibold px-2 py-1 rounded bg-amber-500/10 border border-amber-500/20">
-                ⚡ Kebal Zap
+                ⚡ Zap Immune
               </span>
             {:else}
               <span class="text-[10px] text-slate-500 font-medium px-2 py-1 rounded bg-slate-900/60 border border-slate-800/80">
-                🛡️ Kebal / &gt;11 Slot
+                🛡️ Immune / &gt;11 Slots
               </span>
             {/if}
           {/if}

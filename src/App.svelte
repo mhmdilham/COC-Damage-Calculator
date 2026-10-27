@@ -25,7 +25,7 @@
         ⚡ CoC ZapQuake Calculator &bull; 100% Client-Side &bull; Svelte 5 + Vite + PWA
       </p>
       <p class="text-[11px] text-slate-600">
-        Clash of Clans adalah merek dagang dari Supercell.
+        Clash of Clans is a trademark of Supercell.
       </p>
     </div>
   </footer>

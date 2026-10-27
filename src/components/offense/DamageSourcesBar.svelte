@@ -66,7 +66,7 @@
             onclick={() => (isAttackerDropdownOpen = !isAttackerDropdownOpen)}
             class="flex items-center gap-2 bg-[#24262c] hover:bg-[#2c2f37] border border-white/10 px-2.5 py-1 rounded-xl transition-all shadow-md cursor-pointer min-w-[76px] justify-between"
             aria-expanded={isAttackerDropdownOpen}
-            title="Set level spell & equipment ke level maksimal TH ini"
+            title="Set spell & equipment to maximum levels for this TH"
           >
             <div class="flex items-center gap-1.5">
               <img
@@ -187,7 +187,7 @@
           <span>👑</span> Gear/Equipment
         </span>
         <span class="text-[10px] font-bold px-1.5 py-0.5 rounded-md border {activeEquipCount > 0 ? 'bg-purple-900/40 border-purple-700/60 text-purple-300' : 'bg-slate-900 border-slate-800 text-slate-500'}">
-          {activeEquipCount} aktif
+          {activeEquipCount} active
         </span>
       </div>
 
@@ -201,11 +201,11 @@
           }}
           class="text-[11px] text-slate-400 hover:text-rose-400 underline cursor-pointer transition-colors"
         >
-          Nonaktifkan Semua
+          Disable All
         </button>
       {:else}
         <span class="text-[11px] text-slate-500 hidden sm:inline">
-          Centang equipment untuk menggabungkan damage (0 Slot Spell)
+          Enable equipment to combine damage (0 Spell Slots)
         </span>
       {/if}
     </div>
@@ -255,7 +255,7 @@
             </span>
             <div class="flex items-center gap-1.5 font-bold {config?.enabled ? 'text-amber-400' : 'text-slate-500'}">
               {#if eq.targetMultiplier?.['air_defense']}
-                <span class="text-[9px] text-sky-400 font-semibold px-1 py-0.5 rounded bg-sky-500/10 border border-sky-500/20" title="Memberikan damage 2x lipat terhadap Air Defense">2x Air Def</span>
+                <span class="text-[9px] text-sky-400 font-semibold px-1 py-0.5 rounded bg-sky-500/10 border border-sky-500/20" title="Deals 2x damage against Air Defense">2x Air Def</span>
               {/if}
               <span>+{dmg} DMG</span>
             </div>
