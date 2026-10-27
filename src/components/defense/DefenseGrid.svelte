@@ -71,12 +71,10 @@
     }
 
     if (calcState.activeCategory === 'key') {
-      return list
-        .filter((d) => KEY_DEFENSES.has(d.id))
-        .sort((a, b) => KEY_DEFENSES_ORDER.indexOf(a.id) - KEY_DEFENSES_ORDER.indexOf(b.id));
+      list = list.filter((d) => KEY_DEFENSES.has(d.id));
     }
 
-    // Tab 'all': Sort from largest spell count to lowest (descending)
+    // Tabs 'all' and 'key': Sort from largest spell count to lowest (descending)
     return [...list].sort((a, b) => {
       const levelA = calcState.defenseLevels[a.id] ?? 1;
       const levelB = calcState.defenseLevels[b.id] ?? 1;
@@ -270,7 +268,7 @@
           ? 'bg-orange-500 text-slate-950 shadow-md shadow-orange-500/20'
           : 'bg-[#181a20] border border-slate-800 text-slate-300 hover:bg-slate-800'}"
       >
-        All ({calcState.availableDefenses.length})
+        All
       </button>
 
       <button
@@ -280,7 +278,7 @@
           ? 'bg-orange-500 text-slate-950 shadow-md shadow-orange-500/20'
           : 'bg-[#181a20] border border-slate-800 text-slate-300 hover:bg-slate-800'}"
       >
-        ⭐ Key Defenses ({calcState.availableDefenses.filter((d) => KEY_DEFENSES.has(d.id)).length})
+        ⭐ Key Defenses
       </button>
 
       <button
