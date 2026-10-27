@@ -186,7 +186,7 @@
 
 <div class="space-y-3">
   <!-- Defense Section Header: Target Base & Defender TH Selector -->
-  <div class="flex items-center justify-between pb-1 gap-3">
+  <div class="flex items-center justify-between pb-2.5 border-b border-slate-800/80 gap-3">
     <div class="flex items-center gap-2">
       <span class="text-xs font-extrabold text-sky-400 uppercase tracking-wider flex items-center gap-1.5">
         <span>🛡️</span> Target Base Defenses
@@ -205,7 +205,7 @@
         <button
           type="button"
           onclick={() => (isDefenderDropdownOpen = !isDefenderDropdownOpen)}
-          class="flex items-center gap-2 bg-[#24262c] hover:bg-[#2c2f37] border border-white/10 px-2.5 py-1.5 rounded-xl transition-all shadow-md cursor-pointer"
+          class="flex items-center gap-2 bg-[#181a20] hover:bg-[#22242c] border border-slate-800 hover:border-slate-700 px-2.5 py-1.5 rounded-xl transition-all shadow-sm cursor-pointer"
           aria-expanded={isDefenderDropdownOpen}
           title="Atur level maksimal pertahanan & HP sesuai TH musuh"
         >

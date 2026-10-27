@@ -35,9 +35,9 @@
 
 <svelte:window onclick={handleClickOutside} onkeydown={handleKeyDown} />
 
-<div class="bg-[#181a20] border border-slate-800 rounded-2xl p-4 shadow-md space-y-4">
-  <!-- Card Header: Attacker Loadout & Attacker TH Preset -->
-  <div class="flex items-center justify-between pb-3 border-b border-slate-800/80 gap-3">
+<div class="space-y-4">
+  <!-- Section Header: Attacker Loadout & Attacker TH Preset -->
+  <div class="flex items-center justify-between pb-2.5 border-b border-slate-800/80 gap-3">
     <div class="flex items-center gap-2">
       <span class="text-xs font-extrabold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
         <span>🗡️</span> Attacker Loadout
@@ -56,7 +56,7 @@
         <button
           type="button"
           onclick={() => (isAttackerDropdownOpen = !isAttackerDropdownOpen)}
-          class="flex items-center gap-2 bg-[#24262c] hover:bg-[#2c2f37] border border-white/10 px-2.5 py-1.5 rounded-xl transition-all shadow-md cursor-pointer"
+          class="flex items-center gap-2 bg-[#181a20] hover:bg-[#22242c] border border-slate-800 hover:border-slate-700 px-2.5 py-1.5 rounded-xl transition-all shadow-sm cursor-pointer"
           aria-expanded={isAttackerDropdownOpen}
           title="Atur level maksimal spell & hero equipment sesuai TH penyerang"
         >
@@ -111,9 +111,9 @@
   </div>
 
   <!-- 1. Attacker Spells (Zap & Quake) -->
-  <div>
-    <div class="flex items-center justify-between pb-2 gap-2">
-      <span class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+  <div class="space-y-2">
+    <div class="flex items-center justify-between text-xs">
+      <span class="font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5 text-[11px]">
         <span>⚡</span> ZapQuake
       </span>
       <span class="text-[11px] text-slate-500">
@@ -124,7 +124,7 @@
     <!-- Attacker Spells Grid -->
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
       <!-- Lightning Spell -->
-      <div class="bg-[#131418] border border-slate-800/90 rounded-xl p-3 flex items-center gap-3">
+      <div class="bg-[#181a20] border border-slate-800 rounded-xl p-3 flex items-center gap-3">
         <img
           src={SPELLS.lightning_spell.icon}
           alt="Zap"
@@ -156,7 +156,7 @@
       </div>
 
       <!-- Earthquake Spell -->
-      <div class="bg-[#131418] border border-slate-800/90 rounded-xl p-3 flex items-center gap-3">
+      <div class="bg-[#181a20] border border-slate-800 rounded-xl p-3 flex items-center gap-3">
         <img
           src={SPELLS.earthquake_spell.icon}
           alt="Quake"
@@ -190,7 +190,7 @@
   </div>
 
   <!-- 2. Attacker Hero Equipments (Grid) -->
-  <div class="pt-3 border-t border-slate-800/80 space-y-2">
+  <div class="space-y-2">
     <div class="flex items-center justify-between text-xs">
       <div class="flex items-center gap-2">
         <span class="font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5 text-[11px]">
@@ -229,7 +229,7 @@
         <div
           class="p-2.5 rounded-xl border transition-all {config?.enabled
             ? 'bg-purple-950/25 border-purple-500/50 text-white'
-            : 'bg-[#131418] border-slate-800 text-slate-400'}"
+            : 'bg-[#181a20] border-slate-800 text-slate-400'}"
         >
           <!-- Checkbox & Info -->
           <div class="flex items-center justify-between gap-2">
