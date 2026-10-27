@@ -262,21 +262,22 @@
             {/if}
           </div>
 
-          <!-- Target Buildings in this Combo -->
-          <div class="pt-3.5 flex items-center justify-center gap-2.5 flex-wrap flex-1 content-center">
+          <!-- Target Buildings in this Combo (Uniform Square Tiles matching Clashify) -->
+          <div class="pt-3.5 flex items-center justify-center gap-2 flex-wrap flex-1 content-center">
             {#each group.defenses as item (item.def.id)}
               <button
                 type="button"
                 onclick={() => calcState.openModal(item.def.id)}
-                class="group relative p-1.5 rounded-xl bg-slate-900/60 hover:bg-slate-800 border border-slate-800/70 hover:border-slate-700 transition-all flex flex-col items-center cursor-pointer shadow-sm hover:scale-105"
-                title="{item.def.name} (Lv {item.level} • {item.maxHp.toLocaleString()} HP)"
+                class="group relative w-12 h-12 sm:w-13 sm:h-13 rounded-xl bg-[#24262d] hover:bg-[#2d3039] border border-slate-700/60 hover:border-orange-500/50 transition-all flex items-center justify-center cursor-pointer shadow-sm hover:scale-105 shrink-0"
+                title="{item.def.name} • Lv {item.level} • {item.maxHp.toLocaleString()} HP"
+                aria-label="{item.def.name} Level {item.level}"
               >
                 <img
                   src={item.imgSrc}
-                  alt={item.def.name}
+                  alt="{item.def.name} Level {item.level}"
                   width="40"
                   height="40"
-                  class="w-10 h-10 aspect-square object-contain drop-shadow"
+                  class="w-9 h-9 sm:w-10 sm:h-10 aspect-square object-contain drop-shadow transition-transform group-hover:scale-110"
                   decoding="async"
                   onerror={(e) => {
                     const img = e.currentTarget as HTMLImageElement;
@@ -288,9 +289,6 @@
                     }
                   }}
                 />
-                <span class="text-[10px] font-semibold text-slate-300 mt-1 max-w-[62px] truncate text-center">
-                  {item.def.name}
-                </span>
               </button>
             {/each}
           </div>
@@ -309,20 +307,21 @@
             </p>
           </div>
 
-          <div class="pt-3.5 flex items-center justify-center gap-2.5 flex-wrap">
+          <div class="pt-3.5 flex items-center justify-center gap-2 flex-wrap">
             {#each noComboDefenses as item (item.def.id)}
               <button
                 type="button"
                 onclick={() => calcState.openModal(item.def.id)}
-                class="group relative p-1.5 rounded-xl bg-slate-900/40 hover:bg-slate-800 border border-slate-800/60 hover:border-slate-700 transition-all flex flex-col items-center cursor-pointer opacity-75 hover:opacity-100 hover:scale-105"
-                title="{item.def.name} (Lv {item.level} • {item.maxHp.toLocaleString()} HP • &gt;11 Slots)"
+                class="group relative w-12 h-12 sm:w-13 sm:h-13 rounded-xl bg-[#24262d]/50 hover:bg-[#2d3039] border border-slate-800/80 hover:border-slate-700 transition-all flex items-center justify-center cursor-pointer opacity-75 hover:opacity-100 shadow-sm hover:scale-105 shrink-0"
+                title="{item.def.name} • Lv {item.level} • {item.maxHp.toLocaleString()} HP • >11 Slots"
+                aria-label="{item.def.name} Level {item.level}"
               >
                 <img
                   src={item.imgSrc}
-                  alt={item.def.name}
+                  alt="{item.def.name} Level {item.level}"
                   width="40"
                   height="40"
-                  class="w-10 h-10 aspect-square object-contain grayscale-[25%] group-hover:grayscale-0 drop-shadow"
+                  class="w-9 h-9 sm:w-10 sm:h-10 aspect-square object-contain grayscale-[25%] group-hover:grayscale-0 drop-shadow transition-transform group-hover:scale-110"
                   decoding="async"
                   onerror={(e) => {
                     const img = e.currentTarget as HTMLImageElement;
@@ -334,9 +333,6 @@
                     }
                   }}
                 />
-                <span class="text-[10px] font-medium text-slate-400 mt-1 max-w-[62px] truncate text-center">
-                  {item.def.name}
-                </span>
               </button>
             {/each}
           </div>
