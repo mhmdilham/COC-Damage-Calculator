@@ -233,10 +233,6 @@
               />
             {/if}
 
-            {#if group.zapCount > 0 && group.eqCount > 0}
-              <span class="text-slate-400 font-bold text-base select-none">+</span>
-            {/if}
-
             {#if group.eqCount > 0}
               <SpellBadge
                 spellId="earthquake_spell"
@@ -244,10 +240,6 @@
                 level={calcState.eqLevel}
                 size="md"
               />
-            {/if}
-
-            {#if (group.zapCount > 0 || group.eqCount > 0) && group.equipments.length > 0}
-              <span class="text-slate-400 font-bold text-base select-none">+</span>
             {/if}
 
             {#each group.equipments as eq (eq.id)}
@@ -366,10 +358,6 @@
                   />
                 {/if}
 
-                {#if best.zapCount > 0 && best.eqCount > 0}
-                  <span class="text-slate-500 font-bold text-xs">+</span>
-                {/if}
-
                 {#if best.eqCount > 0}
                   <SpellBadge
                     spellId="earthquake_spell"
@@ -377,10 +365,6 @@
                     level={calcState.eqLevel}
                     size="sm"
                   />
-                {/if}
-
-                {#if (best.zapCount > 0 || best.eqCount > 0) && calcState.enabledEquipments.length > 0}
-                  <span class="text-slate-500 font-bold text-xs">+</span>
                 {/if}
 
                 {#each calcState.enabledEquipments as eq (eq.id)}

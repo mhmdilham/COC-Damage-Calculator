@@ -200,10 +200,6 @@
                   />
                 {/if}
 
-                {#if combo.zapCount > 0 && combo.eqCount > 0}
-                  <span class="text-slate-400 font-bold text-lg select-none">+</span>
-                {/if}
-
                 {#if combo.eqCount > 0}
                   <SpellBadge
                     spellId="earthquake_spell"
@@ -211,10 +207,6 @@
                     level={calcState.eqLevel}
                     size="md"
                   />
-                {/if}
-
-                {#if (combo.zapCount > 0 || combo.eqCount > 0) && calcState.enabledEquipments.length > 0}
-                  <span class="text-slate-400 font-bold text-lg select-none">+</span>
                 {/if}
 
                 {#each calcState.enabledEquipments as eq (eq.id)}
