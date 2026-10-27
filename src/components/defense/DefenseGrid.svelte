@@ -20,6 +20,7 @@
   interface ComboDefenseItem {
     def: DefenseData;
     level: number;
+    displayLevel: number;
     maxHp: number;
     imgSrc: string;
     isSupercharge: boolean;
@@ -101,12 +102,14 @@
       const maxHp = def.hp[level - 1] ?? def.hp[0];
       const best = calcState.getBestComboFor(def, level);
       const isSupercharge = !!(def.superchargeLevel && level === def.superchargeLevel);
+      const displayLevel = isSupercharge ? level - 1 : level;
       const imageLevel = def.superchargeLevel && level >= def.superchargeLevel ? def.superchargeLevel - 1 : level;
       const imgSrc = def.type === 'hero' ? (def.icon || `/images/defense/${def.id}/1.webp`) : `/images/defense/${def.id}/${imageLevel}.webp`;
 
       const item: ComboDefenseItem = {
         def,
         level,
+        displayLevel,
         maxHp,
         imgSrc,
         isSupercharge,
@@ -269,12 +272,12 @@
                 type="button"
                 onclick={() => calcState.openModal(item.def.id)}
                 class="group relative w-12 h-12 sm:w-13 sm:h-13 rounded-xl bg-[#24262d] hover:bg-[#2d3039] border border-slate-700/60 hover:border-orange-500/50 transition-all flex items-center justify-center cursor-pointer shadow-sm hover:scale-105 shrink-0"
-                title="{item.def.name} • Lv {item.level} • {item.maxHp.toLocaleString()} HP"
-                aria-label="{item.def.name} Level {item.level}"
+                title="{item.def.name} • Lv {item.displayLevel}{item.isSupercharge ? ' ⚡⚡' : ''} • {item.maxHp.toLocaleString()} HP"
+                aria-label="{item.def.name} Level {item.displayLevel}{item.isSupercharge ? ' Supercharged' : ''}"
               >
                 <img
                   src={item.imgSrc}
-                  alt="{item.def.name} Level {item.level}"
+                  alt="{item.def.name} Level {item.displayLevel}"
                   width="40"
                   height="40"
                   class="w-9 h-9 sm:w-10 sm:h-10 aspect-square object-contain drop-shadow transition-transform group-hover:scale-110"
@@ -313,12 +316,12 @@
                 type="button"
                 onclick={() => calcState.openModal(item.def.id)}
                 class="group relative w-12 h-12 sm:w-13 sm:h-13 rounded-xl bg-[#24262d]/50 hover:bg-[#2d3039] border border-slate-800/80 hover:border-slate-700 transition-all flex items-center justify-center cursor-pointer opacity-75 hover:opacity-100 shadow-sm hover:scale-105 shrink-0"
-                title="{item.def.name} • Lv {item.level} • {item.maxHp.toLocaleString()} HP • >11 Slots"
-                aria-label="{item.def.name} Level {item.level}"
+                title="{item.def.name} • Lv {item.displayLevel}{item.isSupercharge ? ' ⚡⚡' : ''} • {item.maxHp.toLocaleString()} HP • >11 Slots"
+                aria-label="{item.def.name} Level {item.displayLevel}{item.isSupercharge ? ' Supercharged' : ''}"
               >
                 <img
                   src={item.imgSrc}
-                  alt="{item.def.name} Level {item.level}"
+                  alt="{item.def.name} Level {item.displayLevel}"
                   width="40"
                   height="40"
                   class="w-9 h-9 sm:w-10 sm:h-10 aspect-square object-contain grayscale-[25%] group-hover:grayscale-0 drop-shadow transition-transform group-hover:scale-110"
@@ -347,6 +350,7 @@
         {@const maxHp = def.hp[level - 1] ?? def.hp[0]}
         {@const best = calcState.getBestComboFor(def, level)}
         {@const isSupercharge = def.superchargeLevel && level === def.superchargeLevel}
+        {@const displayLevel = isSupercharge ? level - 1 : level}
         {@const imageLevel = def.superchargeLevel && level >= def.superchargeLevel ? def.superchargeLevel - 1 : level}
         {@const imgSrc = def.type === 'hero' ? (def.icon || `/images/defense/${def.id}/1.webp`) : `/images/defense/${def.id}/${imageLevel}.webp`}
 
@@ -410,7 +414,7 @@
           <div class="w-14 h-14 flex items-center justify-center my-1">
             <img
               src={imgSrc}
-              alt="{def.name} Level {level}"
+              alt="{def.name} Level {displayLevel}"
               width="56"
               height="56"
               class="w-14 h-14 aspect-square object-contain drop-shadow transition-transform group-hover:scale-105"
@@ -434,7 +438,7 @@
             </div>
             <div class="flex items-center justify-center gap-1.5 text-[10px] text-slate-400 mt-0.5">
               <span class="font-semibold text-slate-300 flex items-center gap-0.5">
-                Lv {level}
+                Lv {displayLevel}
                 {#if isSupercharge}
                   <span class="text-amber-400 font-bold" title="Supercharged (⚡⚡)">⚡⚡</span>
                 {/if}

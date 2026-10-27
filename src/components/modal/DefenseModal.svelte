@@ -25,6 +25,16 @@
     !!(defense && defense.superchargeLevel && currentLevel === defense.superchargeLevel)
   );
 
+  const displayLevel = $derived(
+    isSupercharge ? currentLevel - 1 : currentLevel
+  );
+
+  const displayMaxLevel = $derived(
+    defense?.superchargeLevel && maxLevel === defense.superchargeLevel
+      ? maxLevel - 1
+      : maxLevel
+  );
+
   const imageLevel = $derived(
     defense && defense.superchargeLevel && currentLevel >= defense.superchargeLevel
       ? defense.superchargeLevel - 1
@@ -96,7 +106,7 @@
               <div class="w-12 h-12 bg-slate-900 rounded-lg border border-slate-800 p-1 flex items-center justify-center shrink-0">
                 <img
                   src={heroOrBuildingImg}
-                  alt="{defense.name} Level {currentLevel}"
+                  alt="{defense.name} Level {displayLevel}"
                   width="48"
                   height="48"
                   class="w-full h-full aspect-square object-contain drop-shadow"
@@ -117,7 +127,7 @@
                   {defense.name}
                 </div>
                 <div class="text-xs text-slate-400 flex items-center gap-1.5">
-                  <span>Level {currentLevel}</span>
+                  <span>Level {displayLevel}</span>
                   {#if isSupercharge}
                     <span class="text-amber-400 font-bold tracking-tight" title="Supercharge (⚡⚡)">⚡⚡</span>
                   {/if}
@@ -151,7 +161,7 @@
               <span>Lv 1</span>
               <span>Slide to adjust level</span>
               <span class="flex items-center gap-0.5">
-                Lv {maxLevel}
+                Lv {displayMaxLevel}
                 {#if defense.superchargeLevel && maxLevel === defense.superchargeLevel}
                   <span class="text-amber-400">⚡⚡</span>
                 {/if}
