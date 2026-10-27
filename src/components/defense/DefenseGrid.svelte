@@ -1,6 +1,8 @@
 <script lang="ts">
   import { calcState } from '../../state/calculator.svelte';
+  import type { DefenseData, ActiveEquipmentConfig } from '../../engine/types';
   import SpellBadge from '../ui/SpellBadge.svelte';
+  import EquipmentBadge from '../ui/EquipmentBadge.svelte';
 
   const KEY_DEFENSES_ORDER = [
     'townhall',
@@ -15,34 +17,147 @@
   ];
   const KEY_DEFENSES = new Set(KEY_DEFENSES_ORDER);
 
+  interface ComboDefenseItem {
+    def: DefenseData;
+    level: number;
+    maxHp: number;
+    imgSrc: string;
+    isSupercharge: boolean;
+  }
+
+  interface ComboGroup {
+    key: string;
+    zapCount: number;
+    eqCount: number;
+    totalSpellSpace: number;
+    equipments: ActiveEquipmentConfig[];
+    defenses: ComboDefenseItem[];
+  }
+
+  // Normal grid filtered & sorted defenses (for 'all' and 'key' tabs)
   const filteredDefenses = $derived.by(() => {
     let list = calcState.availableDefenses;
 
-    // Filter by tab
-    if (calcState.activeCategory === 'key') {
-      list = list
-        .filter((d) => KEY_DEFENSES.has(d.id))
-        .sort((a, b) => KEY_DEFENSES_ORDER.indexOf(a.id) - KEY_DEFENSES_ORDER.indexOf(b.id));
-    } else if (calcState.activeCategory === 'standard') {
-      list = list.filter((d) => d.type === 'building' && !KEY_DEFENSES.has(d.id));
-    } else if (calcState.activeCategory === 'heroes') {
-      list = list.filter((d) => d.type === 'hero');
-    }
-
-    // Filter by search query
+    // Filter by search query if any
     if (calcState.searchQuery.trim()) {
       const q = calcState.searchQuery.toLowerCase().trim();
       list = list.filter((d) => d.name.toLowerCase().includes(q));
     }
 
-    return list;
+    if (calcState.activeCategory === 'key') {
+      return list
+        .filter((d) => KEY_DEFENSES.has(d.id))
+        .sort((a, b) => KEY_DEFENSES_ORDER.indexOf(a.id) - KEY_DEFENSES_ORDER.indexOf(b.id));
+    }
+
+    // Tab 'all': Sort from largest spell count to lowest (descending)
+    return [...list].sort((a, b) => {
+      const levelA = calcState.defenseLevels[a.id] ?? 1;
+      const levelB = calcState.defenseLevels[b.id] ?? 1;
+      const bestA = calcState.getBestComboFor(a, levelA);
+      const bestB = calcState.getBestComboFor(b, levelB);
+
+      // Defenses with valid combo come before unbreakable/immune
+      if (bestA && !bestB) return -1;
+      if (!bestA && bestB) return 1;
+      if (!bestA && !bestB) {
+        const hpA = a.hp[levelA - 1] ?? 0;
+        const hpB = b.hp[levelB - 1] ?? 0;
+        return hpB - hpA; // Highest HP first among unbreakable
+      }
+
+      // 1. Total spell space descending (11 down to 0)
+      if (bestB!.totalSpellSpace !== bestA!.totalSpellSpace) {
+        return bestB!.totalSpellSpace - bestA!.totalSpellSpace;
+      }
+
+      // 2. If spell count is equal, prefer more Quakes (larger area damage)
+      if (bestB!.eqCount !== bestA!.eqCount) {
+        return bestB!.eqCount - bestA!.eqCount;
+      }
+
+      // 3. Tie-breaker: higher HP first
+      const hpA = a.hp[levelA - 1] ?? 0;
+      const hpB = b.hp[levelB - 1] ?? 0;
+      return hpB - hpA;
+    });
+  });
+
+  // Grouped by combo data (for 'combo' tab)
+  const { comboGroups, noComboDefenses } = $derived.by(() => {
+    let list = calcState.availableDefenses;
+
+    if (calcState.searchQuery.trim()) {
+      const q = calcState.searchQuery.toLowerCase().trim();
+      list = list.filter((d) => d.name.toLowerCase().includes(q));
+    }
+
+    const activeEquips = calcState.enabledEquipments;
+    const groupMap: Record<string, ComboGroup> = {};
+    const noCombos: ComboDefenseItem[] = [];
+
+    for (const def of list) {
+      const level = calcState.defenseLevels[def.id] ?? 1;
+      const maxHp = def.hp[level - 1] ?? def.hp[0];
+      const best = calcState.getBestComboFor(def, level);
+      const isSupercharge = !!(def.superchargeLevel && level === def.superchargeLevel);
+      const imageLevel = def.superchargeLevel && level >= def.superchargeLevel ? def.superchargeLevel - 1 : level;
+      const imgSrc = def.type === 'hero' ? (def.icon || `/images/defense/${def.id}/1.webp`) : `/images/defense/${def.id}/${imageLevel}.webp`;
+
+      const item: ComboDefenseItem = {
+        def,
+        level,
+        maxHp,
+        imgSrc,
+        isSupercharge,
+      };
+
+      if (!best) {
+        noCombos.push(item);
+      } else {
+        const eqSig = activeEquips.map((e: ActiveEquipmentConfig) => `${e.id}@${e.level}`).join(',');
+        const key = `${best.zapCount}_${best.eqCount}_${eqSig}`;
+
+        if (!groupMap[key]) {
+          groupMap[key] = {
+            key,
+            zapCount: best.zapCount,
+            eqCount: best.eqCount,
+            totalSpellSpace: best.totalSpellSpace,
+            equipments: activeEquips,
+            defenses: [],
+          };
+        }
+        groupMap[key].defenses.push(item);
+      }
+    }
+
+    // Sort groups:
+    // 1. Highest totalSpellSpace first (e.g. 11, ..., 1, 0)
+    // 2. If equal, higher eqCount first
+    const sortedGroups = Object.values(groupMap).sort((a, b) => {
+      if (b.totalSpellSpace !== a.totalSpellSpace) {
+        return b.totalSpellSpace - a.totalSpellSpace;
+      }
+      return b.eqCount - a.eqCount;
+    });
+
+    // Sort defenses inside each group by HP descending
+    for (const g of sortedGroups) {
+      g.defenses.sort((a, b) => b.maxHp - a.maxHp);
+    }
+
+    // Sort noCombos by HP descending
+    noCombos.sort((a, b) => b.maxHp - a.maxHp);
+
+    return { comboGroups: sortedGroups, noComboDefenses: noCombos };
   });
 </script>
 
 <div class="space-y-3">
   <!-- Filter & Search Bar -->
   <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-    <!-- Category Tabs -->
+    <!-- 3 Category Tabs: All, Key Defenses, Group By Combo -->
     <div class="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none text-xs">
       <button
         type="button"
@@ -66,22 +181,12 @@
 
       <button
         type="button"
-        onclick={() => (calcState.activeCategory = 'standard')}
-        class="px-3 py-1.5 rounded-xl font-bold transition-all cursor-pointer {calcState.activeCategory === 'standard'
+        onclick={() => (calcState.activeCategory = 'combo')}
+        class="px-3 py-1.5 rounded-xl font-bold transition-all cursor-pointer {calcState.activeCategory === 'combo'
           ? 'bg-orange-500 text-slate-950 shadow-md shadow-orange-500/20'
           : 'bg-[#181a20] border border-slate-800 text-slate-300 hover:bg-slate-800'}"
       >
-        🛡️ Standard
-      </button>
-
-      <button
-        type="button"
-        onclick={() => (calcState.activeCategory = 'heroes')}
-        class="px-3 py-1.5 rounded-xl font-bold transition-all cursor-pointer {calcState.activeCategory === 'heroes'
-          ? 'bg-orange-500 text-slate-950 shadow-md shadow-orange-500/20'
-          : 'bg-[#181a20] border border-slate-800 text-slate-300 hover:bg-slate-800'}"
-      >
-        👑 Heroes
+        📑 Group By Combo
       </button>
     </div>
 
@@ -109,30 +214,155 @@
     </div>
   </div>
 
-  <!-- Cards Grid (Clashify Style) -->
-  <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-    {#each filteredDefenses as def (def.id)}
-      {@const level = calcState.defenseLevels[def.id] ?? 1}
-      {@const maxHp = def.hp[level - 1] ?? def.hp[0]}
-      {@const best = calcState.getBestComboFor(def, level)}
-      {@const isSupercharge = def.superchargeLevel && level === def.superchargeLevel}
-      {@const imageLevel = def.superchargeLevel && level >= def.superchargeLevel ? def.superchargeLevel - 1 : level}
-      {@const imgSrc = def.type === 'hero' ? (def.icon || `/images/defense/${def.id}/1.webp`) : `/images/defense/${def.id}/${imageLevel}.webp`}
+  {#if calcState.activeCategory === 'combo'}
+    <!-- Group By Combo View (Clashify Style) -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+      {#each comboGroups as group (group.key)}
+        <div class="bg-[#181a20] border border-slate-800/90 hover:border-slate-700/80 rounded-2xl p-4 flex flex-col justify-between shadow-sm transition-all min-h-[160px]">
+          <!-- Combo Recipe Header -->
+          <div class="flex items-center justify-center gap-2 flex-wrap pb-3.5 border-b border-slate-800/70 min-h-[58px]">
+            {#if group.zapCount > 0}
+              <SpellBadge
+                spellId="lightning_spell"
+                count={group.zapCount}
+                level={calcState.zapLevel}
+                size="md"
+              />
+            {/if}
 
-      <button
-        type="button"
-        onclick={() => calcState.openModal(def.id)}
-        class="bg-[#181a20] hover:bg-[#1f222a] border border-slate-800 hover:border-slate-700/80 rounded-2xl p-3 flex flex-col justify-between items-center text-center transition-all cursor-pointer shadow-sm hover:shadow-md hover:-translate-y-0.5 group min-h-[175px]"
-      >
-        <!-- Top: Best Combo Preview -->
-        <div class="w-full flex items-center justify-center min-h-[50px] pb-2">
-          {#if best}
-            {#if best.totalSpellSpace === 0}
-              <span class="text-[11px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-1 rounded-lg">
-                💥 0 Spells (Equipment)
+            {#if group.zapCount > 0 && group.eqCount > 0}
+              <span class="text-slate-400 font-bold text-base select-none">+</span>
+            {/if}
+
+            {#if group.eqCount > 0}
+              <SpellBadge
+                spellId="earthquake_spell"
+                count={group.eqCount}
+                level={calcState.eqLevel}
+                size="md"
+              />
+            {/if}
+
+            {#if (group.zapCount > 0 || group.eqCount > 0) && group.equipments.length > 0}
+              <span class="text-slate-400 font-bold text-base select-none">+</span>
+            {/if}
+
+            {#each group.equipments as eq (eq.id)}
+              <EquipmentBadge
+                equipmentId={eq.id}
+                level={eq.level}
+                size="md"
+              />
+            {/each}
+
+            {#if group.totalSpellSpace === 0}
+              <span class="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded ml-1">
+                0 Spell
               </span>
-            {:else}
-              <div class="flex items-center gap-1.5 justify-center">
+            {/if}
+          </div>
+
+          <!-- Target Buildings in this Combo -->
+          <div class="pt-3.5 flex items-center justify-center gap-2.5 flex-wrap flex-1 content-center">
+            {#each group.defenses as item (item.def.id)}
+              <button
+                type="button"
+                onclick={() => calcState.openModal(item.def.id)}
+                class="group relative p-1.5 rounded-xl bg-slate-900/60 hover:bg-slate-800 border border-slate-800/70 hover:border-slate-700 transition-all flex flex-col items-center cursor-pointer shadow-sm hover:scale-105"
+                title="{item.def.name} (Lv {item.level} • {item.maxHp.toLocaleString()} HP)"
+              >
+                <img
+                  src={item.imgSrc}
+                  alt={item.def.name}
+                  width="40"
+                  height="40"
+                  class="w-10 h-10 aspect-square object-contain drop-shadow"
+                  decoding="async"
+                  onerror={(e) => {
+                    const img = e.currentTarget as HTMLImageElement;
+                    if (!img.src.endsWith('/1.webp')) {
+                      img.src = `/images/defense/${item.def.id}/1.webp`;
+                    } else {
+                      img.onerror = null;
+                      img.src = '/images/other/defense.webp';
+                    }
+                  }}
+                />
+                <span class="text-[10px] font-semibold text-slate-300 mt-1 max-w-[62px] truncate text-center">
+                  {item.def.name}
+                </span>
+              </button>
+            {/each}
+          </div>
+        </div>
+      {/each}
+
+      <!-- No Combo Available Card -->
+      {#if noComboDefenses.length > 0}
+        <div class="bg-[#15161b] border border-slate-800/80 rounded-2xl p-4 flex flex-col justify-between shadow-sm col-span-full">
+          <div class="text-center pb-3 border-b border-slate-800/60">
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">
+              No combo available
+            </span>
+            <p class="text-[11px] text-slate-500 mt-0.5">
+              Immune to current setup or requires &gt;11 spell slots
+            </p>
+          </div>
+
+          <div class="pt-3.5 flex items-center justify-center gap-2.5 flex-wrap">
+            {#each noComboDefenses as item (item.def.id)}
+              <button
+                type="button"
+                onclick={() => calcState.openModal(item.def.id)}
+                class="group relative p-1.5 rounded-xl bg-slate-900/40 hover:bg-slate-800 border border-slate-800/60 hover:border-slate-700 transition-all flex flex-col items-center cursor-pointer opacity-75 hover:opacity-100 hover:scale-105"
+                title="{item.def.name} (Lv {item.level} • {item.maxHp.toLocaleString()} HP - Immune / Unbreakable)"
+              >
+                <img
+                  src={item.imgSrc}
+                  alt={item.def.name}
+                  width="40"
+                  height="40"
+                  class="w-10 h-10 aspect-square object-contain grayscale-[25%] group-hover:grayscale-0 drop-shadow"
+                  decoding="async"
+                  onerror={(e) => {
+                    const img = e.currentTarget as HTMLImageElement;
+                    if (!img.src.endsWith('/1.webp')) {
+                      img.src = `/images/defense/${item.def.id}/1.webp`;
+                    } else {
+                      img.onerror = null;
+                      img.src = '/images/other/defense.webp';
+                    }
+                  }}
+                />
+                <span class="text-[10px] font-medium text-slate-400 mt-1 max-w-[62px] truncate text-center">
+                  {item.def.name}
+                </span>
+              </button>
+            {/each}
+          </div>
+        </div>
+      {/if}
+    </div>
+  {:else}
+    <!-- All & Key Defenses Grid View -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+      {#each filteredDefenses as def (def.id)}
+        {@const level = calcState.defenseLevels[def.id] ?? 1}
+        {@const maxHp = def.hp[level - 1] ?? def.hp[0]}
+        {@const best = calcState.getBestComboFor(def, level)}
+        {@const isSupercharge = def.superchargeLevel && level === def.superchargeLevel}
+        {@const imageLevel = def.superchargeLevel && level >= def.superchargeLevel ? def.superchargeLevel - 1 : level}
+        {@const imgSrc = def.type === 'hero' ? (def.icon || `/images/defense/${def.id}/1.webp`) : `/images/defense/${def.id}/${imageLevel}.webp`}
+
+        <button
+          type="button"
+          onclick={() => calcState.openModal(def.id)}
+          class="bg-[#181a20] hover:bg-[#1f222a] border border-slate-800 hover:border-slate-700/80 rounded-2xl p-3 flex flex-col justify-between items-center text-center transition-all cursor-pointer shadow-sm hover:shadow-md hover:-translate-y-0.5 group min-h-[175px]"
+        >
+          <!-- Top: Best Combo Preview -->
+          <div class="w-full flex items-center justify-center min-h-[50px] pb-2">
+            {#if best}
+              <div class="flex items-center gap-1.5 justify-center flex-wrap">
                 {#if best.zapCount > 0}
                   <SpellBadge
                     spellId="lightning_spell"
@@ -143,7 +373,7 @@
                 {/if}
 
                 {#if best.zapCount > 0 && best.eqCount > 0}
-                  <span class="text-slate-500 font-bold text-sm">+</span>
+                  <span class="text-slate-500 font-bold text-xs">+</span>
                 {/if}
 
                 {#if best.eqCount > 0}
@@ -154,59 +384,77 @@
                     size="sm"
                   />
                 {/if}
+
+                {#if (best.zapCount > 0 || best.eqCount > 0) && calcState.enabledEquipments.length > 0}
+                  <span class="text-slate-500 font-bold text-xs">+</span>
+                {/if}
+
+                {#each calcState.enabledEquipments as eq (eq.id)}
+                  <EquipmentBadge
+                    equipmentId={eq.id}
+                    level={eq.level}
+                    size="sm"
+                  />
+                {/each}
+
+                {#if best.totalSpellSpace === 0}
+                  <span class="text-[9px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-1.5 py-0.5 rounded leading-none">
+                    0 Spell
+                  </span>
+                {/if}
               </div>
-            {/if}
-          {:else}
-            {#if def.immune.includes('lightning_spell')}
-              <span class="text-[10px] text-amber-400 font-semibold px-2 py-1 rounded bg-amber-500/10 border border-amber-500/20">
-                ⚡ Zap Immune
-              </span>
             {:else}
-              <span class="text-[10px] text-slate-500 font-medium px-2 py-1 rounded bg-slate-900/60 border border-slate-800/80">
-                🛡️ Immune / &gt;11 Slots
-              </span>
-            {/if}
-          {/if}
-        </div>
-
-        <!-- Middle: Building Image -->
-        <div class="w-14 h-14 flex items-center justify-center my-1">
-          <img
-            src={imgSrc}
-            alt="{def.name} Level {level}"
-            width="56"
-            height="56"
-            class="w-14 h-14 aspect-square object-contain drop-shadow transition-transform group-hover:scale-105"
-            decoding="async"
-            onerror={(e) => {
-              const img = e.currentTarget as HTMLImageElement;
-              if (!img.src.endsWith('/1.webp')) {
-                img.src = `/images/defense/${def.id}/1.webp`;
-              } else {
-                img.onerror = null;
-                img.src = '/images/other/defense.webp';
-              }
-            }}
-          />
-        </div>
-
-        <!-- Bottom: Name, Level & HP -->
-        <div class="w-full pt-1">
-          <div class="text-xs font-bold text-white truncate leading-tight">
-            {def.name}
-          </div>
-          <div class="flex items-center justify-center gap-1.5 text-[10px] text-slate-400 mt-0.5">
-            <span class="font-semibold text-slate-300 flex items-center gap-0.5">
-              Lv {level}
-              {#if isSupercharge}
-                <span class="text-amber-400 font-bold" title="Supercharged (⚡⚡)">⚡⚡</span>
+              {#if def.immune.includes('lightning_spell')}
+                <span class="text-[10px] text-amber-400 font-semibold px-2 py-1 rounded bg-amber-500/10 border border-amber-500/20">
+                  ⚡ Zap Immune
+                </span>
+              {:else}
+                <span class="text-[10px] text-slate-500 font-medium px-2 py-1 rounded bg-slate-900/60 border border-slate-800/80">
+                  🛡️ Immune / &gt;11 Slots
+                </span>
               {/if}
-            </span>
-            <span>&bull;</span>
-            <span class="text-rose-400 font-medium">{maxHp.toLocaleString()} HP</span>
+            {/if}
           </div>
-        </div>
-      </button>
-    {/each}
-  </div>
+
+          <!-- Middle: Building Image -->
+          <div class="w-14 h-14 flex items-center justify-center my-1">
+            <img
+              src={imgSrc}
+              alt="{def.name} Level {level}"
+              width="56"
+              height="56"
+              class="w-14 h-14 aspect-square object-contain drop-shadow transition-transform group-hover:scale-105"
+              decoding="async"
+              onerror={(e) => {
+                const img = e.currentTarget as HTMLImageElement;
+                if (!img.src.endsWith('/1.webp')) {
+                  img.src = `/images/defense/${def.id}/1.webp`;
+                } else {
+                  img.onerror = null;
+                  img.src = '/images/other/defense.webp';
+                }
+              }}
+            />
+          </div>
+
+          <!-- Bottom: Name, Level & HP -->
+          <div class="w-full pt-1">
+            <div class="text-xs font-bold text-white truncate leading-tight">
+              {def.name}
+            </div>
+            <div class="flex items-center justify-center gap-1.5 text-[10px] text-slate-400 mt-0.5">
+              <span class="font-semibold text-slate-300 flex items-center gap-0.5">
+                Lv {level}
+                {#if isSupercharge}
+                  <span class="text-amber-400 font-bold" title="Supercharged (⚡⚡)">⚡⚡</span>
+                {/if}
+              </span>
+              <span>&bull;</span>
+              <span class="text-rose-400 font-medium">{maxHp.toLocaleString()} HP</span>
+            </div>
+          </div>
+        </button>
+      {/each}
+    </div>
+  {/if}
 </div>

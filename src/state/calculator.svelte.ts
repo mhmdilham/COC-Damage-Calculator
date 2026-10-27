@@ -34,7 +34,7 @@ class CalculatorState {
 
   // Search & Category filter for defense grid
   searchQuery = $state<string>('');
-  activeCategory = $state<'all' | 'key' | 'standard' | 'heroes'>('all');
+  activeCategory = $state<'all' | 'key' | 'combo'>('all');
 
   constructor() {
     this.initDefenseLevels(this.targetThLevel);
@@ -106,7 +106,7 @@ class CalculatorState {
     Object.values(DEFENSES).filter((d) => d.unlockedAtTH <= this.targetThLevel)
   );
 
-  // Active equipments list
+  // Active equipments list (all configs)
   activeEquipmentsList = $derived<ActiveEquipmentConfig[]>(
     Object.entries(this.equipments).map(([id, conf]) => ({
       id,
@@ -114,6 +114,17 @@ class CalculatorState {
       enabled: conf.enabled,
     }))
   );
+
+  // Enabled equipments list (only enabled with level > 0)
+  get enabledEquipments(): ActiveEquipmentConfig[] {
+    return Object.entries(this.equipments)
+      .filter(([_, conf]) => conf.enabled && conf.level > 0)
+      .map(([id, conf]) => ({
+        id,
+        level: conf.level,
+        enabled: true,
+      }));
+  }
 
   // Calculate all combos for a given defense
   getCombosFor(defense: DefenseData, level?: number): ComboResult[] {

@@ -2,6 +2,7 @@
   import { calcState } from '../../state/calculator.svelte';
   import { DEFENSES } from '../../data/defenses';
   import SpellBadge from '../ui/SpellBadge.svelte';
+  import EquipmentBadge from '../ui/EquipmentBadge.svelte';
 
   const defenseId = $derived(calcState.selectedDefenseId);
   const defense = $derived(defenseId ? DEFENSES[defenseId] : null);
@@ -174,10 +175,19 @@
       <div class="px-5 pb-5 pt-1 overflow-y-auto space-y-2.5 flex-1 scrollbar-thin">
         {#if combos.length > 0}
           {#each combos as combo, idx (idx)}
-            <div class="bg-[#24262d] border border-slate-800/90 rounded-xl p-3 flex items-center justify-center gap-3 transition-colors hover:border-slate-700">
+            <div class="bg-[#24262d] border border-slate-800/90 rounded-xl p-3 flex items-center justify-center gap-3 transition-colors hover:border-slate-700 flex-wrap">
               {#if combo.totalSpellSpace === 0}
-                <div class="text-emerald-400 font-bold text-xs flex items-center gap-1.5 py-1.5">
-                  <span>💥 Destroyed entirely by Hero Equipment! (0 Spell Slots)</span>
+                <div class="flex items-center justify-center gap-2 flex-wrap py-1">
+                  {#each calcState.enabledEquipments as eq (eq.id)}
+                    <EquipmentBadge
+                      equipmentId={eq.id}
+                      level={eq.level}
+                      size="md"
+                    />
+                  {/each}
+                  <span class="text-emerald-400 font-bold text-xs ml-1">
+                    💥 Destroyed entirely by Equipment! (0 Spells)
+                  </span>
                 </div>
               {:else}
                 <!-- Spell Badges -->
@@ -203,8 +213,20 @@
                   />
                 {/if}
 
+                {#if (combo.zapCount > 0 || combo.eqCount > 0) && calcState.enabledEquipments.length > 0}
+                  <span class="text-slate-400 font-bold text-lg select-none">+</span>
+                {/if}
+
+                {#each calcState.enabledEquipments as eq (eq.id)}
+                  <EquipmentBadge
+                    equipmentId={eq.id}
+                    level={eq.level}
+                    size="md"
+                  />
+                {/each}
+
                 <!-- Spell space badge on right -->
-                <span class="ml-2 text-[10px] bg-slate-900 border border-slate-700/60 text-slate-400 font-semibold px-2 py-1 rounded-md">
+                <span class="ml-2 text-[10px] bg-slate-900 border border-slate-700/60 text-slate-400 font-semibold px-2 py-1 rounded-md shrink-0">
                   {combo.totalSpellSpace} Slot{combo.totalSpellSpace > 1 ? 's' : ''}
                 </span>
               {/if}
