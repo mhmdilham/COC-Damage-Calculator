@@ -1,13 +1,115 @@
 <script lang="ts">
   import { calcState } from '../../state/calculator.svelte';
   import { SPELLS, EQUIPMENTS } from '../../data/offenses';
+  import type { TownHallLevel } from '../../engine/types';
+
+  const thLevelsDescending: TownHallLevel[] = [
+    18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1,
+  ];
+
+  let isAttackerDropdownOpen = $state(false);
+  let attackerDropdownRef = $state<HTMLElement | null>(null);
 
   const activeEquipCount = $derived(
     Object.values(calcState.equipments).filter((e) => e.enabled).length
   );
+
+  function selectAttackerTH(th: TownHallLevel) {
+    calcState.setAttackerTH(th);
+    isAttackerDropdownOpen = false;
+  }
+
+  function handleClickOutside(e: MouseEvent) {
+    const targetNode = e.target as Node;
+    if (isAttackerDropdownOpen && attackerDropdownRef && !attackerDropdownRef.contains(targetNode)) {
+      isAttackerDropdownOpen = false;
+    }
+  }
+
+  function handleKeyDown(e: KeyboardEvent) {
+    if (e.key === 'Escape') {
+      isAttackerDropdownOpen = false;
+    }
+  }
 </script>
 
+<svelte:window onclick={handleClickOutside} onkeydown={handleKeyDown} />
+
 <div class="bg-[#181a20] border border-slate-800 rounded-2xl p-4 shadow-md space-y-4">
+  <!-- Card Header: Attacker Loadout & Attacker TH Preset -->
+  <div class="flex items-center justify-between pb-3 border-b border-slate-800/80 gap-3">
+    <div class="flex items-center gap-2">
+      <span class="text-xs font-extrabold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+        <span>🗡️</span> Attacker Loadout
+      </span>
+      <span class="text-[10px] text-slate-500 hidden sm:inline font-medium">
+        (Zap, Quake & Hero Equipments)
+      </span>
+    </div>
+
+    <!-- Attacker TH Selector -->
+    <div class="flex items-center gap-2">
+      <span class="text-[11px] font-medium text-slate-400 hidden xs:inline">
+        Max Lv:
+      </span>
+      <div class="relative" bind:this={attackerDropdownRef}>
+        <button
+          type="button"
+          onclick={() => (isAttackerDropdownOpen = !isAttackerDropdownOpen)}
+          class="flex items-center gap-2 bg-[#24262c] hover:bg-[#2c2f37] border border-white/10 px-2.5 py-1.5 rounded-xl transition-all shadow-md cursor-pointer"
+          aria-expanded={isAttackerDropdownOpen}
+          title="Atur level maksimal spell & hero equipment sesuai TH penyerang"
+        >
+          <img
+            src="/images/defense/townhall/{calcState.attackerThLevel}.webp"
+            alt="TH {calcState.attackerThLevel}"
+            width="20"
+            height="20"
+            class="w-5 h-5 aspect-square object-contain drop-shadow"
+          />
+          <span class="text-sm font-extrabold text-white tracking-tight leading-none">
+            TH {calcState.attackerThLevel}
+          </span>
+          <span class="text-[10px] text-slate-400 font-bold transition-transform duration-150 {isAttackerDropdownOpen ? 'rotate-180' : ''}">
+            ▾
+          </span>
+        </button>
+
+        {#if isAttackerDropdownOpen}
+          <div
+            class="absolute right-0 top-full mt-1.5 z-50 w-36 max-h-64 overflow-y-auto bg-[#1f2127] border border-white/10 rounded-xl shadow-2xl p-1 space-y-0.5 scrollbar-thin"
+          >
+            {#each thLevelsDescending as th (th)}
+              <button
+                type="button"
+                onclick={() => selectAttackerTH(th)}
+                class="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-left transition-colors cursor-pointer {calcState.attackerThLevel === th
+                  ? 'bg-amber-500/20 text-amber-300 font-extrabold border border-amber-500/30'
+                  : 'text-slate-300 hover:text-white hover:bg-[#282a32]'}"
+              >
+                <div class="flex items-center gap-2">
+                  <img
+                    src="/images/defense/townhall/{th}.webp"
+                    alt="TH {th}"
+                    width="20"
+                    height="20"
+                    class="w-5 h-5 aspect-square object-contain drop-shadow shrink-0"
+                  />
+                  <span class="text-xs font-bold">
+                    Town Hall {th}
+                  </span>
+                </div>
+                {#if calcState.attackerThLevel === th}
+                  <span class="text-xs text-amber-400 font-bold">✓</span>
+                {/if}
+              </button>
+            {/each}
+          </div>
+        {/if}
+      </div>
+    </div>
+  </div>
+
   <!-- 1. Attacker Spells (Zap & Quake) -->
   <div>
     <div class="flex items-center justify-between pb-2 gap-2">

@@ -1,8 +1,33 @@
 <script lang="ts">
   import { calcState } from '../../state/calculator.svelte';
-  import type { DefenseData, ActiveEquipmentConfig } from '../../engine/types';
+  import type { DefenseData, ActiveEquipmentConfig, TownHallLevel } from '../../engine/types';
   import SpellBadge from '../ui/SpellBadge.svelte';
   import EquipmentBadge from '../ui/EquipmentBadge.svelte';
+
+  const thLevelsDescending: TownHallLevel[] = [
+    18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1,
+  ];
+
+  let isDefenderDropdownOpen = $state(false);
+  let defenderDropdownRef = $state<HTMLElement | null>(null);
+
+  function selectDefenderTH(th: TownHallLevel) {
+    calcState.setTargetTH(th);
+    isDefenderDropdownOpen = false;
+  }
+
+  function handleClickOutside(e: MouseEvent) {
+    const targetNode = e.target as Node;
+    if (isDefenderDropdownOpen && defenderDropdownRef && !defenderDropdownRef.contains(targetNode)) {
+      isDefenderDropdownOpen = false;
+    }
+  }
+
+  function handleKeyDown(e: KeyboardEvent) {
+    if (e.key === 'Escape') {
+      isDefenderDropdownOpen = false;
+    }
+  }
 
   const KEY_DEFENSES_ORDER = [
     'townhall',
@@ -157,7 +182,83 @@
   });
 </script>
 
+<svelte:window onclick={handleClickOutside} onkeydown={handleKeyDown} />
+
 <div class="space-y-3">
+  <!-- Defense Section Header: Target Base & Defender TH Selector -->
+  <div class="flex items-center justify-between pb-1 gap-3">
+    <div class="flex items-center gap-2">
+      <span class="text-xs font-extrabold text-sky-400 uppercase tracking-wider flex items-center gap-1.5">
+        <span>🛡️</span> Target Base Defenses
+      </span>
+      <span class="text-[10px] text-slate-500 hidden sm:inline font-medium">
+        (Defenses & Heroes)
+      </span>
+    </div>
+
+    <!-- Target TH Selector -->
+    <div class="flex items-center gap-2">
+      <span class="text-[11px] font-medium text-slate-400 hidden xs:inline">
+        Enemy Base:
+      </span>
+      <div class="relative" bind:this={defenderDropdownRef}>
+        <button
+          type="button"
+          onclick={() => (isDefenderDropdownOpen = !isDefenderDropdownOpen)}
+          class="flex items-center gap-2 bg-[#24262c] hover:bg-[#2c2f37] border border-white/10 px-2.5 py-1.5 rounded-xl transition-all shadow-md cursor-pointer"
+          aria-expanded={isDefenderDropdownOpen}
+          title="Atur level maksimal pertahanan & HP sesuai TH musuh"
+        >
+          <img
+            src="/images/defense/townhall/{calcState.targetThLevel}.webp"
+            alt="TH {calcState.targetThLevel}"
+            width="20"
+            height="20"
+            class="w-5 h-5 aspect-square object-contain drop-shadow"
+          />
+          <span class="text-sm font-extrabold text-white tracking-tight leading-none">
+            TH {calcState.targetThLevel}
+          </span>
+          <span class="text-[10px] text-slate-400 font-bold transition-transform duration-150 {isDefenderDropdownOpen ? 'rotate-180' : ''}">
+            ▾
+          </span>
+        </button>
+
+        {#if isDefenderDropdownOpen}
+          <div
+            class="absolute right-0 top-full mt-1.5 z-50 w-36 max-h-64 overflow-y-auto bg-[#1f2127] border border-white/10 rounded-xl shadow-2xl p-1 space-y-0.5 scrollbar-thin"
+          >
+            {#each thLevelsDescending as th (th)}
+              <button
+                type="button"
+                onclick={() => selectDefenderTH(th)}
+                class="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-left transition-colors cursor-pointer {calcState.targetThLevel === th
+                  ? 'bg-sky-500/20 text-sky-300 font-extrabold border border-sky-500/30'
+                  : 'text-slate-300 hover:text-white hover:bg-[#282a32]'}"
+              >
+                <div class="flex items-center gap-2">
+                  <img
+                    src="/images/defense/townhall/{th}.webp"
+                    alt="TH {th}"
+                    width="20"
+                    height="20"
+                    class="w-5 h-5 aspect-square object-contain drop-shadow shrink-0"
+                  />
+                  <span class="text-xs font-bold">
+                    Town Hall {th}
+                  </span>
+                </div>
+                {#if calcState.targetThLevel === th}
+                  <span class="text-xs text-sky-400 font-bold">✓</span>
+                {/if}
+              </button>
+            {/each}
+          </div>
+        {/if}
+      </div>
+    </div>
+  </div>
+
   <!-- Filter & Search Bar -->
   <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
     <!-- 3 Category Tabs: All, Key Defenses, Group By Combo -->
