@@ -45,7 +45,6 @@
     width="48"
     height="48"
     class="w-full h-full aspect-square object-cover p-1 scale-105"
-    loading="lazy"
     decoding="async"
   />
 

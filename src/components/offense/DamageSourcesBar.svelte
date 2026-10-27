@@ -87,7 +87,7 @@
             <div
               class="absolute right-0 top-full mt-1.5 z-50 w-28 max-h-64 overflow-y-auto bg-[#1f2127] border border-white/10 rounded-xl shadow-2xl p-1 space-y-0.5 scrollbar-thin"
             >
-              {#each thLevelsDescending as th}
+              {#each thLevelsDescending as th (th)}
                 <button
                   type="button"
                   onclick={() => selectAttackerTH(th)}
@@ -315,7 +315,7 @@
         <div
           class="absolute right-0 top-full mt-1.5 z-50 w-28 max-h-64 overflow-y-auto bg-[#1f2127] border border-white/10 rounded-xl shadow-2xl p-1 space-y-0.5 scrollbar-thin"
         >
-          {#each thLevelsDescending as th}
+          {#each thLevelsDescending as th (th)}
             <button
               type="button"
               onclick={() => selectTH(th)}

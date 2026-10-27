@@ -177,7 +177,6 @@
             width="56"
             height="56"
             class="w-14 h-14 aspect-square object-contain drop-shadow transition-transform group-hover:scale-105"
-            loading="lazy"
             decoding="async"
             onerror={(e) => {
               const img = e.currentTarget as HTMLImageElement;
