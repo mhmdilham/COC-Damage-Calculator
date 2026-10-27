@@ -224,17 +224,17 @@
 
         {#if isDefenderDropdownOpen}
           <div
-            class="absolute right-0 top-full mt-1.5 z-50 w-36 max-h-64 overflow-y-auto bg-[#1f2127] border border-white/10 rounded-xl shadow-2xl p-1 space-y-0.5 scrollbar-thin"
+            class="absolute right-0 top-full mt-1.5 z-50 w-44 max-h-64 overflow-y-auto bg-[#1f2127] border border-white/10 rounded-xl shadow-2xl p-1 space-y-0.5 scrollbar-thin"
           >
             {#each thLevelsDescending as th (th)}
               <button
                 type="button"
                 onclick={() => selectDefenderTH(th)}
-                class="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-left transition-colors cursor-pointer {calcState.targetThLevel === th
+                class="w-full flex items-center justify-between gap-2 px-2.5 py-1.5 rounded-lg text-left transition-colors cursor-pointer min-h-[36px] {calcState.targetThLevel === th
                   ? 'bg-sky-500/20 text-sky-300 font-extrabold border border-sky-500/30'
                   : 'text-slate-300 hover:text-white hover:bg-[#282a32]'}"
               >
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2 min-w-0">
                   <img
                     src="/images/defense/townhall/{th}.webp"
                     alt="TH {th}"
@@ -242,12 +242,12 @@
                     height="20"
                     class="w-5 h-5 aspect-square object-contain drop-shadow shrink-0"
                   />
-                  <span class="text-xs font-bold">
+                  <span class="text-xs font-bold whitespace-nowrap">
                     Town Hall {th}
                   </span>
                 </div>
                 {#if calcState.targetThLevel === th}
-                  <span class="text-xs text-sky-400 font-bold">✓</span>
+                  <span class="text-xs text-sky-400 font-bold shrink-0">✓</span>
                 {/if}
               </button>
             {/each}
