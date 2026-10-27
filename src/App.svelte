@@ -1,5 +1,6 @@
 <script lang="ts">
   import Header from './components/layout/Header.svelte';
+  import MatchupBar from './components/matchup/MatchupBar.svelte';
   import DamageSourcesBar from './components/offense/DamageSourcesBar.svelte';
   import DefenseGrid from './components/defense/DefenseGrid.svelte';
   import DefenseModal from './components/modal/DefenseModal.svelte';
@@ -9,7 +10,10 @@
   <Header />
 
   <main class="flex-1 max-w-6xl w-full mx-auto p-3 sm:p-5 space-y-4">
-    <!-- Top: Target Town Hall & Attacker Damage Sources -->
+    <!-- Battle Matchup: Attacker TH vs Defender TH -->
+    <MatchupBar />
+
+    <!-- Attacker Damage Sources (ZapQuake & Hero Equipments) -->
     <DamageSourcesBar />
 
     <!-- Defense Grid (Clashify Style) -->

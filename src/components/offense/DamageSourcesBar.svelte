@@ -1,51 +1,11 @@
 <script lang="ts">
   import { calcState } from '../../state/calculator.svelte';
   import { SPELLS, EQUIPMENTS } from '../../data/offenses';
-  import type { TownHallLevel } from '../../engine/types';
-
-  const thLevelsDescending: TownHallLevel[] = [
-    18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1,
-  ];
-
-  let isDropdownOpen = $state(false);
-  let dropdownRef = $state<HTMLElement | null>(null);
-
-  let isAttackerDropdownOpen = $state(false);
-  let attackerDropdownRef = $state<HTMLElement | null>(null);
 
   const activeEquipCount = $derived(
     Object.values(calcState.equipments).filter((e) => e.enabled).length
   );
-
-  function selectTH(th: TownHallLevel) {
-    calcState.setTargetTH(th);
-    isDropdownOpen = false;
-  }
-
-  function selectAttackerTH(th: TownHallLevel) {
-    calcState.setAttackerTH(th);
-    isAttackerDropdownOpen = false;
-  }
-
-  function handleClickOutside(e: MouseEvent) {
-    const targetNode = e.target as Node;
-    if (isDropdownOpen && dropdownRef && !dropdownRef.contains(targetNode)) {
-      isDropdownOpen = false;
-    }
-    if (isAttackerDropdownOpen && attackerDropdownRef && !attackerDropdownRef.contains(targetNode)) {
-      isAttackerDropdownOpen = false;
-    }
-  }
-
-  function handleKeyDown(e: KeyboardEvent) {
-    if (e.key === 'Escape') {
-      isDropdownOpen = false;
-      isAttackerDropdownOpen = false;
-    }
-  }
 </script>
-
-<svelte:window onclick={handleClickOutside} onkeydown={handleKeyDown} />
 
 <div class="bg-[#181a20] border border-slate-800 rounded-2xl p-4 shadow-md space-y-4">
   <!-- 1. Attacker Spells (Zap & Quake) -->
@@ -54,61 +14,9 @@
       <span class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
         <span>⚡</span> ZapQuake
       </span>
-
-      <!-- Attacker TH Preset Dropdown (Matching Reference Screenshot) -->
-      <div class="flex items-center gap-2">
-        <span class="text-[11px] font-medium text-slate-400 hidden xs:inline">
-          Max Lv TH:
-        </span>
-        <div class="relative" bind:this={attackerDropdownRef}>
-          <button
-            type="button"
-            onclick={() => (isAttackerDropdownOpen = !isAttackerDropdownOpen)}
-            class="flex items-center gap-2 bg-[#24262c] hover:bg-[#2c2f37] border border-white/10 px-2.5 py-1 rounded-xl transition-all shadow-md cursor-pointer min-w-[76px] justify-between"
-            aria-expanded={isAttackerDropdownOpen}
-            title="Set spell & equipment to maximum levels for this TH"
-          >
-            <div class="flex items-center gap-1.5">
-              <img
-                src="/images/defense/townhall/{calcState.attackerThLevel}.webp"
-                alt="TH {calcState.attackerThLevel}"
-                class="w-5 h-5 aspect-square object-contain drop-shadow"
-              />
-              <span class="text-sm font-extrabold text-white tracking-tight leading-none">
-                {calcState.attackerThLevel}
-              </span>
-            </div>
-            <span class="text-[10px] text-slate-400 font-bold transition-transform duration-150 {isAttackerDropdownOpen ? 'rotate-180' : ''}">
-              ▾
-            </span>
-          </button>
-
-          {#if isAttackerDropdownOpen}
-            <div
-              class="absolute right-0 top-full mt-1.5 z-50 w-28 max-h-64 overflow-y-auto bg-[#1f2127] border border-white/10 rounded-xl shadow-2xl p-1 space-y-0.5 scrollbar-thin"
-            >
-              {#each thLevelsDescending as th (th)}
-                <button
-                  type="button"
-                  onclick={() => selectAttackerTH(th)}
-                  class="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-left transition-colors cursor-pointer {calcState.attackerThLevel === th
-                    ? 'bg-[#2e313a] text-white font-extrabold'
-                    : 'text-slate-300 hover:text-white hover:bg-[#282a32]'}"
-                >
-                  <img
-                    src="/images/defense/townhall/{th}.webp"
-                    alt="TH {th}"
-                    class="w-5 h-5 aspect-square object-contain drop-shadow shrink-0"
-                  />
-                  <span class="text-sm font-bold text-white">
-                    {th}
-                  </span>
-                </button>
-              {/each}
-            </div>
-          {/if}
-        </div>
-      </div>
+      <span class="text-[11px] text-slate-500">
+        Spell Damage
+      </span>
     </div>
 
     <!-- Attacker Spells Grid -->
@@ -277,66 +185,6 @@
           {/if}
         </div>
       {/each}
-    </div>
-  </div>
-
-  <!-- 3. Target Town Hall Selector (Moved below Equipment Grid) -->
-  <div class="pt-3 border-t border-slate-800/80 flex items-center justify-between gap-3">
-    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-      <span>🏰</span> Town Hall
-    </span>
-
-    <!-- Dropdown Selector (Matching Image 2) -->
-    <div class="relative" bind:this={dropdownRef}>
-      <button
-        type="button"
-        onclick={() => (isDropdownOpen = !isDropdownOpen)}
-        class="flex items-center gap-2.5 bg-[#24262c] hover:bg-[#2c2f37] border border-white/10 px-3 py-1.5 rounded-xl transition-all shadow-md cursor-pointer min-w-[90px] justify-between"
-        aria-expanded={isDropdownOpen}
-      >
-        <div class="flex items-center gap-2">
-          <img
-            src="/images/defense/townhall/{calcState.targetThLevel}.webp"
-            alt="TH {calcState.targetThLevel}"
-            width="24"
-            height="24"
-            class="w-6 h-6 aspect-square object-contain drop-shadow"
-          />
-          <span class="text-base font-extrabold text-white tracking-tight leading-none">
-            {calcState.targetThLevel}
-          </span>
-        </div>
-        <span class="text-xs text-slate-400 font-bold transition-transform duration-150 {isDropdownOpen ? 'rotate-180' : ''}">
-          ▾
-        </span>
-      </button>
-
-      {#if isDropdownOpen}
-        <div
-          class="absolute right-0 top-full mt-1.5 z-50 w-28 max-h-64 overflow-y-auto bg-[#1f2127] border border-white/10 rounded-xl shadow-2xl p-1 space-y-0.5 scrollbar-thin"
-        >
-          {#each thLevelsDescending as th (th)}
-            <button
-              type="button"
-              onclick={() => selectTH(th)}
-              class="w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-left transition-colors cursor-pointer {calcState.targetThLevel === th
-                ? 'bg-[#2e313a] text-white font-extrabold'
-                : 'text-slate-300 hover:text-white hover:bg-[#282a32]'}"
-            >
-              <img
-                src="/images/defense/townhall/{th}.webp"
-                alt="TH {th}"
-                width="24"
-                height="24"
-                class="w-6 h-6 aspect-square object-contain drop-shadow shrink-0"
-              />
-              <span class="text-base font-bold text-white">
-                {th}
-              </span>
-            </button>
-          {/each}
-        </div>
-      {/if}
     </div>
   </div>
 </div>
