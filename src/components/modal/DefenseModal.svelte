@@ -121,16 +121,6 @@
                   {#if isSupercharge}
                     <span class="text-amber-400 font-bold tracking-tight" title="Supercharge (⚡⚡)">⚡⚡</span>
                   {/if}
-                  {#if defense.immune.includes('lightning_spell')}
-                    <span class="text-[10px] text-amber-300 font-semibold bg-amber-500/10 border border-amber-500/20 px-1.5 py-0.5 rounded">
-                      Zap Immune
-                    </span>
-                  {/if}
-                  {#if defense.immune.includes('earthquake_spell')}
-                    <span class="text-[10px] text-orange-300 font-semibold bg-orange-500/10 border border-orange-500/20 px-1.5 py-0.5 rounded">
-                      Quake Immune
-                    </span>
-                  {/if}
                 </div>
               </div>
             </div>
@@ -235,13 +225,7 @@
         {:else}
           <div class="bg-[#16171b] border border-slate-800 rounded-xl p-6 text-center text-xs text-slate-500 italic space-y-1">
             <p>🛡️ Cannot be destroyed with the current spell setup.</p>
-            {#if defense.immune.includes('lightning_spell')}
-              <p class="text-[11px] text-amber-400 font-medium">This building is immune to Lightning/Zap (only affected by Earthquake & Hero Equipment).</p>
-            {:else if defense.immune.includes('earthquake_spell')}
-              <p class="text-[11px] text-orange-400 font-medium">This target is immune to Earthquake.</p>
-            {:else}
-              <p class="text-[11px] text-slate-600">Ensure spell level is greater than 0 or enable Hero Equipment.</p>
-            {/if}
+            <p class="text-[11px] text-slate-600">Requires more than 11 spell slots. Try enabling Hero Equipment or increasing spell levels.</p>
           </div>
         {/if}
       </div>

@@ -305,7 +305,7 @@
               No combo available
             </span>
             <p class="text-[11px] text-slate-500 mt-0.5">
-              Immune to current setup or requires &gt;11 spell slots
+              Requires &gt;11 spell slots with the current setup
             </p>
           </div>
 
@@ -315,7 +315,7 @@
                 type="button"
                 onclick={() => calcState.openModal(item.def.id)}
                 class="group relative p-1.5 rounded-xl bg-slate-900/40 hover:bg-slate-800 border border-slate-800/60 hover:border-slate-700 transition-all flex flex-col items-center cursor-pointer opacity-75 hover:opacity-100 hover:scale-105"
-                title="{item.def.name} (Lv {item.level} • {item.maxHp.toLocaleString()} HP - Immune / Unbreakable)"
+                title="{item.def.name} (Lv {item.level} • {item.maxHp.toLocaleString()} HP • &gt;11 Slots)"
               >
                 <img
                   src={item.imgSrc}
@@ -404,15 +404,9 @@
                 {/if}
               </div>
             {:else}
-              {#if def.immune.includes('lightning_spell')}
-                <span class="text-[10px] text-amber-400 font-semibold px-2 py-1 rounded bg-amber-500/10 border border-amber-500/20">
-                  ⚡ Zap Immune
-                </span>
-              {:else}
-                <span class="text-[10px] text-slate-500 font-medium px-2 py-1 rounded bg-slate-900/60 border border-slate-800/80">
-                  🛡️ Immune / &gt;11 Slots
-                </span>
-              {/if}
+              <span class="text-[10px] text-slate-500 font-medium px-2 py-1 rounded bg-slate-900/60 border border-slate-800/80">
+                🛡️ &gt;11 Slots
+              </span>
             {/if}
           </div>
 
