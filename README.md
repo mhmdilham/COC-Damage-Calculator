@@ -2,7 +2,7 @@
 
 A modern, fast, and offline-ready web application designed to calculate the optimal combination of **Lightning Spells (Zap)**, **Earthquake Spells (Quake)**, and **Hero Equipments** required to take down any defense building or defending hero in **Clash of Clans (Town Hall 1 – 18)**.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
 [![Svelte](https://img.shields.io/badge/Svelte-5-orange?logo=svelte)](https://svelte.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-6.0-blue?logo=typescript)](https://www.typescriptlang.org/)
 [![Vite](https://img.shields.io/badge/Vite-8.3-purple?logo=vite)](https://vitejs.dev/)
@@ -108,4 +108,4 @@ This project is not affiliated with, endorsed, sponsored, or specifically approv
 
 ## 📄 License
 
-Distributed under the [MIT License](LICENSE).
+Distributed under the [GNU General Public License v3.0 (GPL-3.0)](LICENSE).
