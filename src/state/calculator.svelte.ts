@@ -1,5 +1,4 @@
 import { DEFENSES } from '../data/defenses';
-import { SPELLS, EQUIPMENTS } from '../data/offenses';
 import { getMaxBuildingLevel } from '../data/thBuildingMaxLevels';
 import { TH_ATTACKER_MAX_LEVELS } from '../data/thAttackerMaxLevels';
 import { calculateCombos } from '../engine/calculator';
@@ -44,7 +43,7 @@ class CalculatorState {
   // Initialize or re-apply all defense levels to max of selected target TH
   initDefenseLevels(th: TownHallLevel) {
     const levels: Record<string, number> = {};
-    for (const [id, def] of Object.entries(DEFENSES)) {
+    for (const id of Object.keys(DEFENSES)) {
       const maxForTh = getMaxBuildingLevel(id, th);
       // If unlocked at this TH, set to max for this TH; otherwise set to 1
       levels[id] = maxForTh > 0 ? maxForTh : 1;
@@ -118,7 +117,7 @@ class CalculatorState {
   // Enabled equipments list (only enabled with level > 0)
   get enabledEquipments(): ActiveEquipmentConfig[] {
     return Object.entries(this.equipments)
-      .filter(([_, conf]) => conf.enabled && conf.level > 0)
+      .filter(([, conf]) => conf.enabled && conf.level > 0)
       .map(([id, conf]) => ({
         id,
         level: conf.level,
@@ -178,8 +177,8 @@ class CalculatorState {
       if (typeof data.eqLevel === 'number') this.eqLevel = data.eqLevel;
       if (data.equipments && typeof data.equipments === 'object') {
         for (const [k, v] of Object.entries(data.equipments)) {
-          if (k in this.equipments) {
-            this.equipments[k] = v as any;
+          if (k in this.equipments && typeof v === 'object' && v !== null) {
+            this.equipments[k] = v as { level: number; enabled: boolean };
           }
         }
       }

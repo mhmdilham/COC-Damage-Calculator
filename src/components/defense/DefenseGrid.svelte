@@ -182,9 +182,9 @@
 
 <svelte:window onclick={handleClickOutside} onkeydown={handleKeyDown} />
 
-<div class="space-y-3">
+<div class="space-y-3 pt-5 border-t border-slate-800">
   <!-- Defense Section Header: Target Base & Defender TH Selector -->
-  <div class="flex items-center justify-between pb-2.5 border-b border-slate-800/80 gap-3">
+  <div class="flex items-center justify-between gap-3">
     <div class="flex items-center gap-2">
       <span class="text-xs font-extrabold text-sky-400 uppercase tracking-wider flex items-center gap-1.5">
         <span>🛡️</span> Target Base Defenses

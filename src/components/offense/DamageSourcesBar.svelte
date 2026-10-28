@@ -19,6 +19,13 @@
     isAttackerDropdownOpen = false;
   }
 
+  function toggleEquipment(id: string) {
+    if (calcState.equipments[id]) {
+      calcState.equipments[id].enabled = !calcState.equipments[id].enabled;
+      calcState.saveToStorage();
+    }
+  }
+
   function handleClickOutside(e: MouseEvent) {
     const targetNode = e.target as Node;
     if (isAttackerDropdownOpen && attackerDropdownRef && !attackerDropdownRef.contains(targetNode)) {
@@ -37,7 +44,7 @@
 
 <div class="space-y-4">
   <!-- Section Header: Attacker Loadout & Attacker TH Preset -->
-  <div class="flex items-center justify-between pb-2.5 border-b border-slate-800/80 gap-3">
+  <div class="flex items-center justify-between gap-3">
     <div class="flex items-center gap-2">
       <span class="text-xs font-extrabold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
         <span>🗡️</span> Attacker Loadout
@@ -203,6 +210,7 @@
             for (const key of Object.keys(calcState.equipments)) {
               calcState.equipments[key].enabled = false;
             }
+            calcState.saveToStorage();
           }}
           class="text-[11px] text-slate-400 hover:text-rose-400 underline cursor-pointer transition-colors"
         >
@@ -210,7 +218,7 @@
         </button>
       {:else}
         <span class="text-[11px] text-slate-500 hidden sm:inline">
-          Enable equipment to combine damage (0 Spell Slots)
+          Enable equipment to combine damage
         </span>
       {/if}
     </div>
@@ -222,20 +230,23 @@
         {@const dmg = config?.level ? eq.damage[config.level] ?? 0 : 0}
 
         <div
-          class="p-2.5 rounded-xl border transition-all {config?.enabled
-            ? 'bg-purple-950/25 border-purple-500/50 text-white'
-            : 'bg-[#181a20] border-slate-800 text-slate-400'}"
+          role="button"
+          tabindex="0"
+          aria-pressed={config?.enabled}
+          onclick={() => toggleEquipment(eq.id)}
+          onkeydown={(e) => {
+            if (e.target === e.currentTarget && (e.key === 'Enter' || e.key === ' ')) {
+              e.preventDefault();
+              toggleEquipment(eq.id);
+            }
+          }}
+          class="p-2.5 rounded-xl border transition-all cursor-pointer select-none text-left {config?.enabled
+            ? 'bg-purple-950/25 border-purple-500/70 text-white shadow-sm shadow-purple-950/40 ring-1 ring-purple-500/30'
+            : 'bg-[#181a20] border-slate-800 text-slate-400 hover:border-slate-700 hover:bg-[#1c1e26]'}"
         >
-          <!-- Checkbox & Info -->
+          <!-- Info Header -->
           <div class="flex items-center justify-between gap-2">
-            <label class="flex items-center gap-2 cursor-pointer min-w-0 flex-1">
-              <input
-                id="equip-{eq.id}"
-                name="equip-{eq.id}"
-                type="checkbox"
-                bind:checked={calcState.equipments[eq.id].enabled}
-                class="accent-purple-500 rounded cursor-pointer w-4 h-4 shrink-0"
-              />
+            <div class="flex items-center gap-2 min-w-0 flex-1">
               <img
                 src={eq.icon}
                 alt={eq.name}
@@ -243,10 +254,10 @@
                 height="24"
                 class="w-6 h-6 aspect-square object-contain rounded shrink-0 drop-shadow"
               />
-              <span class="text-xs font-semibold truncate">
+              <span class="text-xs font-semibold truncate {config?.enabled ? 'text-white' : 'text-slate-300'}">
                 {eq.name}
               </span>
-            </label>
+            </div>
 
             <span class="text-[9px] uppercase font-bold px-1.5 py-0.5 rounded shrink-0 {eq.rarity === 'epic' ? 'bg-purple-900/50 text-purple-300 border border-purple-700/60' : 'bg-slate-800 text-slate-400'}">
               {eq.rarity}
@@ -267,7 +278,13 @@
           </div>
 
           {#if config?.enabled}
-            <div class="pt-1">
+            <!-- svelte-ignore a11y_no_static_element_interactions -->
+            <div
+              class="pt-1"
+              onclick={(e) => e.stopPropagation()}
+              onpointerdown={(e) => e.stopPropagation()}
+              onkeydown={(e) => e.stopPropagation()}
+            >
               <label for="equip-level-{eq.id}" class="sr-only">Level {eq.name}</label>
               <input
                 id="equip-level-{eq.id}"
@@ -276,6 +293,7 @@
                 min="1"
                 max={eq.maxLevel}
                 bind:value={calcState.equipments[eq.id].level}
+                oninput={() => calcState.saveToStorage()}
                 class="w-full accent-purple-500 cursor-pointer h-1.5 bg-slate-900 rounded-lg"
               />
             </div>

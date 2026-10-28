@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { calculateCombos, round2 } from './calculator';
+import { calculateCombos } from './calculator';
+import type { TownHallLevel } from './types';
 import { DEFENSES } from '../data/defenses';
 
 describe('CoC Damage Calculator Engine', () => {
@@ -232,7 +233,7 @@ describe('CoC Damage Calculator Engine', () => {
 
       // TH 1 to 10: should be locked (return 0)
       for (let th = 1; th <= 10; th++) {
-        expect(getMaxBuildingLevel(modId, th as any)).toBe(0);
+        expect(getMaxBuildingLevel(modId, th as TownHallLevel)).toBe(0);
       }
 
       // TH 11 to 18: max levels per Town Hall
@@ -248,7 +249,7 @@ describe('CoC Damage Calculator Engine', () => {
       };
 
       for (const [th, maxLv] of Object.entries(expectedMax)) {
-        expect(getMaxBuildingLevel(modId, Number(th) as any)).toBe(maxLv);
+        expect(getMaxBuildingLevel(modId, Number(th) as TownHallLevel)).toBe(maxLv);
       }
     }
   });
@@ -273,14 +274,14 @@ describe('CoC Damage Calculator Engine', () => {
 
       // Below unlockedAtTH, must return 0
       for (let th = 1; th < spec.unlockedAtTH; th++) {
-        expect(getMaxBuildingLevel(spec.id, th as any)).toBe(0);
+        expect(getMaxBuildingLevel(spec.id, th as TownHallLevel)).toBe(0);
       }
 
       // At unlockedAtTH, max level must match initialMax
-      expect(getMaxBuildingLevel(spec.id, spec.unlockedAtTH as any)).toBe(spec.initialMax);
+      expect(getMaxBuildingLevel(spec.id, spec.unlockedAtTH as TownHallLevel)).toBe(spec.initialMax);
 
       // At TH 18, all heroes should have their highest level
-      expect(getMaxBuildingLevel(spec.id, 18 as any)).toBe(hero.hp.length);
+      expect(getMaxBuildingLevel(spec.id, 18 as TownHallLevel)).toBe(hero.hp.length);
     }
   });
 
@@ -288,20 +289,20 @@ describe('CoC Damage Calculator Engine', () => {
     const { getMaxBuildingLevel } = await import('../data/thBuildingMaxLevels');
 
     // Builder's Hut
-    expect(getMaxBuildingLevel('builders_hut', 10 as any)).toBe(1);
-    expect(getMaxBuildingLevel('builders_hut', 13 as any)).toBe(1);
-    expect(getMaxBuildingLevel('builders_hut', 14 as any)).toBe(4);
-    expect(getMaxBuildingLevel('builders_hut', 15 as any)).toBe(5);
-    expect(getMaxBuildingLevel('builders_hut', 16 as any)).toBe(6);
-    expect(getMaxBuildingLevel('builders_hut', 17 as any)).toBe(7);
-    expect(getMaxBuildingLevel('builders_hut', 18 as any)).toBe(9); // 8 + Supercharge
+    expect(getMaxBuildingLevel('builders_hut', 10 as TownHallLevel)).toBe(1);
+    expect(getMaxBuildingLevel('builders_hut', 13 as TownHallLevel)).toBe(1);
+    expect(getMaxBuildingLevel('builders_hut', 14 as TownHallLevel)).toBe(4);
+    expect(getMaxBuildingLevel('builders_hut', 15 as TownHallLevel)).toBe(5);
+    expect(getMaxBuildingLevel('builders_hut', 16 as TownHallLevel)).toBe(6);
+    expect(getMaxBuildingLevel('builders_hut', 17 as TownHallLevel)).toBe(7);
+    expect(getMaxBuildingLevel('builders_hut', 18 as TownHallLevel)).toBe(9); // 8 + Supercharge
 
     // Monolith
-    expect(getMaxBuildingLevel('monolith', 14 as any)).toBe(0);
-    expect(getMaxBuildingLevel('monolith', 15 as any)).toBe(2);
-    expect(getMaxBuildingLevel('monolith', 16 as any)).toBe(3);
-    expect(getMaxBuildingLevel('monolith', 17 as any)).toBe(4);
-    expect(getMaxBuildingLevel('monolith', 18 as any)).toBe(6); // 5 + Supercharge
+    expect(getMaxBuildingLevel('monolith', 14 as TownHallLevel)).toBe(0);
+    expect(getMaxBuildingLevel('monolith', 15 as TownHallLevel)).toBe(2);
+    expect(getMaxBuildingLevel('monolith', 16 as TownHallLevel)).toBe(3);
+    expect(getMaxBuildingLevel('monolith', 17 as TownHallLevel)).toBe(4);
+    expect(getMaxBuildingLevel('monolith', 18 as TownHallLevel)).toBe(6); // 5 + Supercharge
   });
 
   it('validates Attacker max levels per Town Hall (Spells and Equipment from Fandom data)', async () => {
