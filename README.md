@@ -1,47 +1,111 @@
-# Svelte + TS + Vite
+# ⚡ Clash of Clans Damage Calculator
 
-This template should help get you started developing with Svelte and TypeScript in Vite.
+A modern, fast, and offline-ready web application designed to calculate the optimal combination of **Lightning Spells (Zap)**, **Earthquake Spells (Quake)**, and **Hero Equipments** required to take down any defense building or defending hero in **Clash of Clans (Town Hall 1 – 18)**.
 
-## Recommended IDE Setup
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Svelte](https://img.shields.io/badge/Svelte-5-orange?logo=svelte)](https://svelte.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-6.0-blue?logo=typescript)](https://www.typescriptlang.org/)
+[![Vite](https://img.shields.io/badge/Vite-8.3-purple?logo=vite)](https://vitejs.dev/)
+[![TailwindCSS](https://img.shields.io/badge/TailwindCSS-v4-38bdf8?logo=tailwindcss)](https://tailwindcss.com/)
 
-[VS Code](https://code.visualstudio.com/) + [Svelte](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode).
+---
 
-## Need an official Svelte framework?
+## 🌟 Key Features
 
-Check out [SvelteKit](https://github.com/sveltejs/kit#readme), which is also powered by Vite. Deploy anywhere with its serverless-first approach and adapt to various platforms, with out of the box support for TypeScript, SCSS, and Less, and easily-added support for mdsvex, GraphQL, PostCSS, Tailwind CSS, and more.
+- **⚡ ZapQuake Math Engine**: Accurately calculates flat Lightning spell damage and diminishing returns for percentage-based Earthquake spells.
+- **👑 Hero Equipment Integration**: Combine spell damage with high-impact Hero Equipments (Spiky Ball, Giant Arrow, Fireball, Seeking Shield, Rocket Backpack, Flame Blower) to save valuable spell housing slots.
+- **🛡️ Full Town Hall Support (TH 1 – 18)**:
+  - Defenses automatically scale to the selected Enemy Town Hall level (including **Supercharge** tiers).
+  - Attacker presets dynamically calibrate maximum allowed spell and equipment levels according to Attacker Town Hall level.
+- **🎯 Interactive Combo Breakdown Modal**: Inspect individual damage steps, sequence of execution, leftover HP, and all alternative spell combinations for every defense.
+- **📱 PWA & 100% Offline Capable**: Pure client-side calculations with local caching. Installable as a Progressive Web App (PWA) on iOS, Android, and Desktop.
+- **⚡ Built on Svelte 5**: Powered by the latest Svelte 5 Runes for fine-grained reactivity, lightning-fast rendering, and lightweight bundle footprint.
 
-## Technical considerations
+---
 
-**Why use this over SvelteKit?**
+## 🎮 How It Works
 
-- It brings its own routing solution which might not be preferable for some users.
-- It is first and foremost a framework that just happens to use Vite under the hood, not a Vite app.
+1. **Configure Attacker Loadout**:
+   - Set your **Attacker Town Hall** (sets default maximum spell and equipment levels).
+   - Adjust **Lightning (Zap)** and **Earthquake (Quake)** spell levels.
+   - Click any **Hero Equipment** card to enable it and fine-tune its level with the slider.
+2. **Select Enemy Base**:
+   - Set the **Enemy Base Town Hall** to automatically adjust all building HP to max levels for that TH.
+   - Filter by **All**, **Key Defenses**, or **Group By Combo**.
+3. **View Optimal Combinations**:
+   - Each card displays the minimum total spell slots required (e.g. `2x Zap + 1x Quake = 3 slots`).
+   - Click on any defense card to open the **Detail Modal** to see alternative combos and adjust custom individual building levels.
 
-This template contains as little as possible to get started with Vite + TypeScript + Svelte, while taking into account the developer experience with regards to HMR and intellisense. It demonstrates capabilities on par with the other `create-vite` templates and is a good starting point for beginners dipping their toes into a Vite + Svelte project.
+---
 
-Should you later need the extended capabilities and extensibility provided by SvelteKit, the template has been structured similarly to SvelteKit so that it is easy to migrate.
+## 🛠️ Tech Stack
 
-**Why `global.d.ts` instead of `compilerOptions.types` inside `jsconfig.json` or `tsconfig.json`?**
+- **Framework**: [Svelte 5](https://svelte.dev/) (with Runes `$state`, `$derived`)
+- **Language**: [TypeScript](https://www.typescriptlang.org/)
+- **Bundler & Dev Server**: [Vite 8](https://vitejs.dev/)
+- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/)
+- **PWA**: [vite-plugin-pwa](https://vite-pwa-org.netlify.app/)
+- **Testing**: [Vitest](https://vitest.dev/)
+- **Linter & Code Quality**: [ESLint](https://eslint.org/) with [`eslint-plugin-svelte`](https://github.com/sveltejs/eslint-plugin-svelte)
 
-Setting `compilerOptions.types` shuts out all other types not explicitly listed in the configuration. Using triple-slash references keeps the default TypeScript setting of accepting type information from the entire workspace, while also adding `svelte` and `vite/client` type information.
+---
 
-**Why include `.vscode/extensions.json`?**
+## 🚀 Getting Started
 
-Other templates indirectly recommend extensions via the README, but this file allows VS Code to prompt the user to install the recommended extension upon opening the project.
+### Prerequisites
 
-**Why enable `allowJs` in the TS template?**
+- [Node.js](https://nodejs.org/) (version 18 or higher recommended)
+- `npm` (comes bundled with Node.js)
 
-While `allowJs: false` would indeed prevent the use of `.js` files in the project, it does not prevent the use of JavaScript syntax in `.svelte` files. In addition, it would force `checkJs: false`, bringing the worst of both worlds: not being able to guarantee the entire codebase is TypeScript, and also having worse typechecking for the existing JavaScript. In addition, there are valid use cases in which a mixed codebase may be relevant.
+### Installation
 
-**Why is HMR not preserving my local component state?**
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/mhmdilham/COC-Damage-Calculator.git
+   cd COC-Damage-Calculator
+   ```
 
-HMR state preservation comes with a number of gotchas! It has been disabled by default in both `svelte-hmr` and `@sveltejs/vite-plugin-svelte` due to its often surprising behavior. You can read the details [here](https://github.com/rixo/svelte-hmr#svelte-hmr).
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
 
-If you have state that's important to retain within a component, consider creating an external store which would not be replaced by HMR.
+3. **Start local development server:**
+   ```bash
+   npm run dev
+   ```
 
-```ts
-// store.ts
-// An extremely simple external store
-import { writable } from 'svelte/store'
-export default writable(0)
-```
+4. **Build for production:**
+   ```bash
+   npm run build
+   ```
+
+5. **Run test suite:**
+   ```bash
+   npm test
+   ```
+
+6. **Run linter & type checker:**
+   ```bash
+   npm run lint
+   npm run check
+   ```
+
+---
+
+## 📖 Acknowledgements & Credits
+
+- **Inspiration**: Heavily inspired by the original concept and work by [Kienlabadao/COC-Damage-Calculator](https://github.com/Kienlabadao/COC-Damage-Calculator).
+- **Game Data & Assets**: All defense statistics, HP numbers, spell ratios, and equipment damage data are sourced from the community-driven [Clash of Clans Wiki on Fandom](https://clashofclans.fandom.com/wiki/Clash_of_Clans_Wiki).
+
+---
+
+## ⚖️ Disclaimer
+
+This project is not affiliated with, endorsed, sponsored, or specifically approved by **Supercell**. Supercell is not responsible for the operation or content of this site/project. For more information about Supercell's policies, visit [Supercell's Fan Content Policy](https://supercell.com/en/fan-content-policy/).
+
+---
+
+## 📄 License
+
+Distributed under the [MIT License](LICENSE).
