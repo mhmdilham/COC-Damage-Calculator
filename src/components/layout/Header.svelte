@@ -6,7 +6,7 @@
         ⚡
       </div>
       <h1 class="text-base font-extrabold tracking-tight text-white">
-        ZapQuake Calc
+        COC Damage Calculator
       </h1>
     </div>
 
