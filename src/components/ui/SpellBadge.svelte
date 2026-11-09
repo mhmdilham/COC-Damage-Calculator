@@ -20,12 +20,12 @@
       : 'w-12 h-12'
   );
 
-  const countTextClasses = $derived(
+  const countBadgeClasses = $derived(
     size === 'sm'
-      ? 'text-[11px] font-black'
+      ? 'text-[8.5px] px-1 py-0.2 min-w-[13px] h-[12px]'
       : size === 'lg'
-      ? 'text-sm font-black'
-      : 'text-xs font-black'
+      ? 'text-xs px-2 py-0.5 min-w-[18px] h-[16px]'
+      : 'text-[9.5px] px-1.5 py-0.5 min-w-[15px] h-[14px]'
   );
 
   const levelBadgeClasses = $derived(
@@ -48,16 +48,16 @@
     decoding="async"
   />
 
-  <!-- Count Overlay (Top: e.g. x5, x2) -->
-  <div class="absolute top-0.5 inset-x-0 flex justify-center pointer-events-none">
-    <span class="{countTextClasses} text-white drop-shadow-[0_1.5px_2px_rgba(0,0,0,0.9)] tracking-tight">
+  <!-- Count Overlay (Top-Right: e.g. x1, x5) - Option A Dark Slate Pill -->
+  <div class="absolute top-0.5 right-0.5 pointer-events-none z-10">
+    <span class="{countBadgeClasses} font-black bg-slate-950/92 text-white rounded-full border border-slate-600/80 shadow-sm leading-none tracking-tight flex items-center justify-center">
       x{count}
     </span>
   </div>
 
-  <!-- Level Overlay (Bottom-left/center: e.g. 13, 5) -->
-  <div class="absolute bottom-1 left-1 pointer-events-none">
-    <span class="{levelBadgeClasses} font-extrabold bg-slate-950/90 text-amber-300 rounded border border-slate-700/80 shadow-sm leading-none">
+  <!-- Level Overlay (Bottom-Center: e.g. 13, 5) - Identical to EquipmentBadge -->
+  <div class="absolute bottom-0.5 inset-x-0 flex justify-center pointer-events-none">
+    <span class="{levelBadgeClasses} font-extrabold bg-slate-950/95 text-amber-300 rounded border border-slate-700/80 shadow-sm leading-none">
       {level}
     </span>
   </div>
