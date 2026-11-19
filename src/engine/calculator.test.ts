@@ -379,4 +379,48 @@ describe('CoC Damage Calculator Engine', () => {
     expect(th19.equipments.rocket_backpack).toBe(27);
     expect(th19.equipments.flame_blower).toBe(18);
   });
+
+  it('validates new TH 19 defenses (Spiky Tower & Firecracker Tower) HP, unlock TH, and combos', async () => {
+    const { getMaxBuildingLevel } = await import('../data/thBuildingMaxLevels');
+
+    const spiky = DEFENSES.spiky_tower;
+    expect(spiky).toBeDefined();
+    expect(spiky.unlockedAtTH).toBe(19);
+    expect(spiky.hp).toEqual([5959, 6363]);
+    expect(spiky.immune).toEqual([]);
+    expect(getMaxBuildingLevel('spiky_tower', 18)).toBe(0);
+    expect(getMaxBuildingLevel('spiky_tower', 19)).toBe(2);
+
+    const firecracker = DEFENSES.firecracker_tower;
+    expect(firecracker).toBeDefined();
+    expect(firecracker.unlockedAtTH).toBe(19);
+    expect(firecracker.hp).toEqual([6500, 6700]);
+    expect(firecracker.immune).toEqual([]);
+    expect(getMaxBuildingLevel('firecracker_tower', 18)).toBe(0);
+    expect(getMaxBuildingLevel('firecracker_tower', 19)).toBe(2);
+
+    // Firecracker Lv 2 (6700 HP) with 1 EQ Lv 5 (29% = 1943) -> remaining 4757 -> 7 Zap Lv 14 (5320) = 8 slots
+    const combos = calculateCombos({
+      defense: firecracker,
+      defenseLevel: 2,
+      zapLevel: 14,
+      eqLevel: 5,
+      equipments: [],
+      maxSpellSpace: 11,
+    });
+    const oneEq = combos.find((c) => c.eqCount === 1);
+    expect(oneEq?.zapCount).toBe(7);
+    expect(oneEq?.totalSpellSpace).toBe(8);
+
+    // Giant Arrow deals 1x (not 2x) to Spiky Tower
+    const gaCheck = calculateCombos({
+      defense: spiky,
+      defenseLevel: 2,
+      zapLevel: 14,
+      eqLevel: 0,
+      equipments: [{ id: 'giant_arrow', level: 18, enabled: true }],
+      maxSpellSpace: 11,
+    });
+    expect(gaCheck[0].damageBreakdown.heroEquipmentDamage).toBe(1500);
+  });
 });

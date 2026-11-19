@@ -231,6 +231,12 @@ export const TH_BUILDING_MAX: Record<string, Partial<Record<TownHallLevel, numbe
   "revenge_tower": {
     "18": 3
   },
+  "spiky_tower": {
+    "19": 2
+  },
+  "firecracker_tower": {
+    "19": 2
+  },
   "townhall": {
     "1": 1,
     "2": 2,

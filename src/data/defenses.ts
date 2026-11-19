@@ -443,6 +443,30 @@ export const DEFENSES: Record<string, DefenseData> = {
     "icon": "/images/defense/revenge_tower/1.webp",
     "superchargeLevel": 3
   },
+  "spiky_tower": {
+    "id": "spiky_tower",
+    "name": "Spiky Tower",
+    "type": "building",
+    "unlockedAtTH": 19,
+    "hp": [
+      5959,
+      6363
+    ],
+    "immune": [],
+    "icon": "/images/defense/spiky_tower/1.webp"
+  },
+  "firecracker_tower": {
+    "id": "firecracker_tower",
+    "name": "Firecracker Tower",
+    "type": "building",
+    "unlockedAtTH": 19,
+    "hp": [
+      6500,
+      6700
+    ],
+    "immune": [],
+    "icon": "/images/defense/firecracker_tower/1.webp"
+  },
   "townhall": {
     "id": "townhall",
     "name": "Town Hall",
