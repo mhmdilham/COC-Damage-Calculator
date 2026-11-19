@@ -114,7 +114,8 @@ export const DEFENSES: Record<string, DefenseData> = {
       1750,
       1850,
       1950,
-      2000
+      2000,
+      2150
     ],
     "immune": [],
     "icon": "/images/defense/air_defense/1.webp"
@@ -186,11 +187,10 @@ export const DEFENSES: Record<string, DefenseData> = {
       1550,
       1650,
       1750,
-      1800
+      1850
     ],
     "immune": [],
-    "icon": "/images/defense/hidden_tesla/1.webp",
-    "superchargeLevel": 18
+    "icon": "/images/defense/hidden_tesla/1.webp"
   },
   "bomb_tower": {
     "id": "bomb_tower",
@@ -236,11 +236,10 @@ export const DEFENSES: Record<string, DefenseData> = {
       4600,
       4800,
       5000,
-      5100
+      5200
     ],
     "immune": [],
-    "icon": "/images/defense/xbow/1.webp",
-    "superchargeLevel": 14
+    "icon": "/images/defense/xbow/1.webp"
   },
   "inferno_tower": {
     "id": "inferno_tower",
@@ -316,11 +315,10 @@ export const DEFENSES: Record<string, DefenseData> = {
       1900,
       2000,
       2100,
-      2150
+      2200
     ],
     "immune": [],
-    "icon": "/images/defense/builders_hut/1.webp",
-    "superchargeLevel": 9
+    "icon": "/images/defense/builders_hut/1.webp"
   },
   "spell_tower": {
     "id": "spell_tower",
@@ -363,11 +361,10 @@ export const DEFENSES: Record<string, DefenseData> = {
       5700,
       6000,
       6100,
-      6250
+      6500
     ],
     "immune": [],
-    "icon": "/images/defense/ricochet_cannon/1.webp",
-    "superchargeLevel": 5
+    "icon": "/images/defense/ricochet_cannon/1.webp"
   },
   "multiarcher_tower": {
     "id": "multiarcher_tower",
@@ -379,11 +376,10 @@ export const DEFENSES: Record<string, DefenseData> = {
       5200,
       5400,
       5500,
-      5600
+      5900
     ],
     "immune": [],
-    "icon": "/images/defense/multiarcher_tower/1.webp",
-    "superchargeLevel": 5
+    "icon": "/images/defense/multiarcher_tower/1.webp"
   },
   "firespitter": {
     "id": "firespitter",
@@ -409,11 +405,10 @@ export const DEFENSES: Record<string, DefenseData> = {
       4000,
       4200,
       4350,
-      4500
+      4700
     ],
     "immune": [],
-    "icon": "/images/defense/multigear_tower/1.webp",
-    "superchargeLevel": 4
+    "icon": "/images/defense/multigear_tower/1.webp"
   },
   "super_wizard_tower": {
     "id": "super_wizard_tower",
@@ -490,7 +485,8 @@ export const DEFENSES: Record<string, DefenseData> = {
       9600,
       10000,
       10400,
-      10800
+      10800,
+      11200
     ],
     "immune": [
       "lightning_spell"
@@ -516,7 +512,8 @@ export const DEFENSES: Record<string, DefenseData> = {
       5400,
       5600,
       5800,
-      6000
+      6000,
+      6200
     ],
     "immune": [
       "lightning_spell"
@@ -638,7 +635,12 @@ export const DEFENSES: Record<string, DefenseData> = {
       12975,
       13100,
       13225,
-      13350
+      13350,
+      13475,
+      13600,
+      13725,
+      13850,
+      13975
     ],
     "immune": [
       "earthquake_spell",
@@ -761,7 +763,12 @@ export const DEFENSES: Record<string, DefenseData> = {
       3504,
       3528,
       3552,
-      3576
+      3576,
+      3600,
+      3624,
+      3648,
+      3672,
+      3696
     ],
     "immune": [
       "earthquake_spell",
@@ -869,7 +876,12 @@ export const DEFENSES: Record<string, DefenseData> = {
       4420,
       4450,
       4480,
-      4510
+      4510,
+      4540,
+      4570,
+      4600,
+      4630,
+      4660
     ],
     "immune": [
       "earthquake_spell",
@@ -967,7 +979,12 @@ export const DEFENSES: Record<string, DefenseData> = {
       2618,
       2635,
       2652,
-      2669
+      2669,
+      2686,
+      2703,
+      2720,
+      2737,
+      2754
     ],
     "immune": [
       "earthquake_spell",
@@ -1035,7 +1052,12 @@ export const DEFENSES: Record<string, DefenseData> = {
       4220,
       4246,
       4272,
-      4298
+      4298,
+      4324,
+      4350,
+      4376,
+      4402,
+      4428
     ],
     "immune": [
       "earthquake_spell",
@@ -1073,7 +1095,12 @@ export const DEFENSES: Record<string, DefenseData> = {
       10675,
       10750,
       10825,
-      10900
+      10900,
+      10975,
+      11050,
+      11125,
+      11200,
+      11275
     ],
     "immune": [
       "earthquake_spell",
