@@ -215,6 +215,11 @@
             width="20"
             height="20"
             class="w-5 h-5 aspect-square object-contain drop-shadow"
+            onerror={(e) => {
+              const img = e.currentTarget as HTMLImageElement;
+              img.onerror = null;
+              img.src = '/images/defense/townhall/18.webp';
+            }}
           />
           <span class="text-sm font-extrabold text-white tracking-tight leading-none">
             TH {calcState.targetThLevel}
@@ -242,6 +247,11 @@
                   width="18"
                   height="18"
                   class="w-[18px] h-[18px] aspect-square object-contain drop-shadow shrink-0"
+                  onerror={(e) => {
+                    const img = e.currentTarget as HTMLImageElement;
+                    img.onerror = null;
+                    img.src = '/images/defense/townhall/18.webp';
+                  }}
                 />
                 <span class="text-xs font-bold whitespace-nowrap">
                   Town Hall {th}
