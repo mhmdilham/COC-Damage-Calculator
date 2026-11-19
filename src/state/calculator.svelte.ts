@@ -9,13 +9,13 @@ class CalculatorState {
   targetThLevel = $state<TownHallLevel>(16);
 
   // Attacker Town Hall Level (sets spells & equipment to max for this TH)
-  attackerThLevel = $state<TownHallLevel>(18);
+  attackerThLevel = $state<TownHallLevel>(19);
 
   // Modal inspection: which defense is currently opened in modal
   selectedDefenseId = $state<string | null>(null);
 
   // Attacker Spell Levels (unrestricted by target TH, default max)
-  zapLevel = $state<number>(13);
+  zapLevel = $state<number>(14);
   eqLevel = $state<number>(5);
 
   // Attacker Hero Equipments (all unlocked and default max levels)
@@ -167,10 +167,10 @@ class CalculatorState {
       const raw = localStorage.getItem('coc_calc_prefs_v2');
       if (!raw) return;
       const data = JSON.parse(raw);
-      if (data.targetThLevel && data.targetThLevel >= 1 && data.targetThLevel <= 18) {
+      if (data.targetThLevel && data.targetThLevel >= 1 && data.targetThLevel <= 19) {
         this.targetThLevel = data.targetThLevel;
       }
-      if (data.attackerThLevel && data.attackerThLevel >= 1 && data.attackerThLevel <= 18) {
+      if (data.attackerThLevel && data.attackerThLevel >= 1 && data.attackerThLevel <= 19) {
         this.attackerThLevel = data.attackerThLevel;
       }
       if (typeof data.zapLevel === 'number') this.zapLevel = data.zapLevel;

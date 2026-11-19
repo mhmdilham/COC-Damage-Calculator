@@ -4,7 +4,7 @@
   import type { TownHallLevel } from '../../engine/types';
 
   const thLevelsDescending: TownHallLevel[] = [
-    18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1,
+    19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1,
   ];
 
   let isAttackerDropdownOpen = $state(false);
@@ -149,7 +149,7 @@
               name="zap-level"
               type="range"
               min="0"
-              max="13"
+              max={SPELLS.lightning_spell.maxLevel}
               bind:value={calcState.zapLevel}
               class="w-full accent-amber-500 cursor-pointer h-2 bg-slate-850 rounded-lg"
             />
