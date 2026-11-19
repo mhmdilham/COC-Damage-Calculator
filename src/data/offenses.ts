@@ -8,7 +8,7 @@ export const SPELLS: Record<string, SpellData> = {
     "housingSpace": 1,
     "unlockedAtTH": 5,
     "icon": "/images/offense/spells/lightning_spell.webp",
-    "maxLevel": 13,
+    "maxLevel": 14,
     "damage": {
       "0": 0,
       "1": 150,
@@ -23,7 +23,8 @@ export const SPELLS: Record<string, SpellData> = {
       "10": 600,
       "11": 640,
       "12": 680,
-      "13": 720
+      "13": 720,
+      "14": 760
     }
   },
   "earthquake_spell": {

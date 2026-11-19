@@ -360,4 +360,23 @@ describe('CoC Damage Calculator Engine', () => {
     expect(th18.equipments.rocket_backpack).toBe(27);
     expect(th18.equipments.flame_blower).toBe(18);
   });
+
+  it('supports Lightning Spell Level 14 (760 DMG) and TH 19 attacker max levels', async () => {
+    const { SPELLS } = await import('../data/offenses');
+    const { TH_ATTACKER_MAX_LEVELS } = await import('../data/thAttackerMaxLevels');
+
+    expect(SPELLS.lightning_spell.maxLevel).toBe(14);
+    expect(SPELLS.lightning_spell.damage[14]).toBe(760);
+
+    const th19 = TH_ATTACKER_MAX_LEVELS[19 as TownHallLevel];
+    expect(th19).toBeDefined();
+    expect(th19.zapLevel).toBe(14);
+    expect(th19.eqLevel).toBe(5);
+    expect(th19.equipments.spiky_ball).toBe(27);
+    expect(th19.equipments.giant_arrow).toBe(18);
+    expect(th19.equipments.fireball).toBe(27);
+    expect(th19.equipments.seeking_shield).toBe(18);
+    expect(th19.equipments.rocket_backpack).toBe(27);
+    expect(th19.equipments.flame_blower).toBe(18);
+  });
 });
