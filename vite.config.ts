@@ -14,7 +14,7 @@ export default defineConfig({
       manifest: {
         name: 'CoC Damage Calculator',
         short_name: 'CoC Calc',
-        description: 'Clash of Clans ZapQuake & Hero Equipment Damage Calculator (TH 1 - TH 19)',
+        description: 'Clash of Clans ZapQuake & Hero Equipment Damage Calculator (Patch v19.32.4 - 16 Nov 2026)',
         theme_color: '#020617',
         background_color: '#020617',
         display: 'standalone',
