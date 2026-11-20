@@ -25,9 +25,11 @@ class CalculatorState {
   // Modal inspection: which defense is currently opened in modal
   selectedDefenseId = $state<string | null>(null);
 
-  // Attacker Spell Levels (unrestricted by target TH, default max)
+  // Attacker Spell Levels & Toggles (unrestricted by target TH, default max & enabled)
   zapLevel = $state<number>(14);
+  zapEnabled = $state<boolean>(true);
   eqLevel = $state<number>(5);
+  eqEnabled = $state<boolean>(true);
 
   // Attacker Hero Equipments (all unlocked and default max levels)
   equipments = $state<Record<string, { level: number; enabled: boolean }>>({
@@ -74,8 +76,18 @@ class CalculatorState {
     this.attackerThLevel = th;
     const maxData = TH_ATTACKER_MAX_LEVELS[th];
     if (maxData) {
-      this.zapLevel = maxData.zapLevel;
-      this.eqLevel = maxData.eqLevel;
+      if (maxData.zapLevel > 0) {
+        this.zapLevel = maxData.zapLevel;
+      } else {
+        this.zapLevel = 1;
+        this.zapEnabled = false;
+      }
+      if (maxData.eqLevel > 0) {
+        this.eqLevel = maxData.eqLevel;
+      } else {
+        this.eqLevel = 1;
+        this.eqEnabled = false;
+      }
       for (const [eqId, maxLv] of Object.entries(maxData.equipments)) {
         if (this.equipments[eqId]) {
           if (maxLv > 0) {
@@ -142,8 +154,8 @@ class CalculatorState {
     return calculateCombos({
       defense,
       defenseLevel: currentLevel,
-      zapLevel: this.zapLevel,
-      eqLevel: this.eqLevel,
+      zapLevel: this.zapEnabled ? this.zapLevel : 0,
+      eqLevel: this.eqEnabled ? this.eqLevel : 0,
       equipments: this.activeEquipmentsList,
       maxSpellSpace: 11, // Standard maximum spell capacity (army camp + CC)
     });
@@ -163,7 +175,9 @@ class CalculatorState {
         targetThLevel: this.targetThLevel,
         attackerThLevel: this.attackerThLevel,
         zapLevel: this.zapLevel,
+        zapEnabled: this.zapEnabled,
         eqLevel: this.eqLevel,
+        eqEnabled: this.eqEnabled,
         equipments: this.equipments,
         defenseLevels: this.defenseLevels,
       };
@@ -198,11 +212,29 @@ class CalculatorState {
       ) {
         this.attackerThLevel = data.attackerThLevel as TownHallLevel;
       }
+      if (typeof data.zapEnabled === 'boolean') {
+        this.zapEnabled = data.zapEnabled;
+      }
       if (typeof data.zapLevel === 'number' && Number.isFinite(data.zapLevel)) {
-        this.zapLevel = Math.max(0, Math.min(Math.round(data.zapLevel), SPELLS.lightning_spell.maxLevel));
+        const roundedZap = Math.round(data.zapLevel);
+        if (roundedZap <= 0) {
+          if (typeof data.zapEnabled !== 'boolean') this.zapEnabled = false;
+          this.zapLevel = 1;
+        } else {
+          this.zapLevel = Math.min(roundedZap, SPELLS.lightning_spell.maxLevel);
+        }
+      }
+      if (typeof data.eqEnabled === 'boolean') {
+        this.eqEnabled = data.eqEnabled;
       }
       if (typeof data.eqLevel === 'number' && Number.isFinite(data.eqLevel)) {
-        this.eqLevel = Math.max(0, Math.min(Math.round(data.eqLevel), 5));
+        const roundedEq = Math.round(data.eqLevel);
+        if (roundedEq <= 0) {
+          if (typeof data.eqEnabled !== 'boolean') this.eqEnabled = false;
+          this.eqLevel = 1;
+        } else {
+          this.eqLevel = Math.min(roundedEq, 5);
+        }
       }
       if (data.equipments && typeof data.equipments === 'object') {
         for (const [k, v] of Object.entries(data.equipments)) {

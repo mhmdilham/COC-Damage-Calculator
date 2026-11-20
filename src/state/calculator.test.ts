@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { render } from 'svelte/server';
 import { calcState } from './calculator.svelte';
+import { DEFENSES } from '../data/defenses';
 import DamageSourcesBar from '../components/offense/DamageSourcesBar.svelte';
 import DefenseGrid from '../components/defense/DefenseGrid.svelte';
 
@@ -42,6 +43,8 @@ describe('CalculatorState and TH 19 UI integration', () => {
     // Reset singleton state before each test so tests are isolated
     calcState.setTargetTH(16);
     calcState.setAttackerTH(18);
+    calcState.zapEnabled = true;
+    calcState.eqEnabled = true;
     calcState.activeCategory = 'all';
     calcState.searchQuery = '';
     store = {};
@@ -143,9 +146,61 @@ describe('CalculatorState and TH 19 UI integration', () => {
     expect(calcState.targetThLevel).toBe(16); // invalid float ignored
     expect(calcState.attackerThLevel).toBe(18); // out-of-range ignored
     expect(calcState.zapLevel).toBe(14); // clamped to Lightning maxLevel
-    expect(calcState.eqLevel).toBe(0); // clamped to >= 0
+    expect(calcState.eqLevel).toBe(1); // clamped to >= 1
+    expect(calcState.eqEnabled).toBe(false); // legacy <= 0 disables spell
     expect(calcState.defenseLevels.air_defense).toBe(17); // clamped to hp.length
     expect(calcState.defenseLevels.cannon).toBe(1); // clamped to >= 1
+  });
+
+  it('toggles Lightning and Earthquake spells on/off while preserving their levels', () => {
+    calcState.setAttackerTH(19);
+    calcState.zapEnabled = true;
+    calcState.eqEnabled = false;
+
+    const airDefense = DEFENSES.air_defense;
+    // With EQ disabled, every combo for Air Defense Lv 17 must have eqCount === 0
+    const zapOnlyCombos = calcState.getCombosFor(airDefense, 17);
+    expect(zapOnlyCombos.length).toBeGreaterThan(0);
+    for (const combo of zapOnlyCombos) {
+      expect(combo.eqCount).toBe(0);
+      expect(combo.zapCount).toBeGreaterThan(0);
+    }
+    expect(calcState.eqLevel).toBe(5); // Level preserved when toggled off
+
+    // With Zap disabled and no equipment, Air Defense cannot be destroyed by EQ alone
+    calcState.zapEnabled = false;
+    calcState.eqEnabled = true;
+    const eqOnlyCombos = calcState.getCombosFor(airDefense, 17);
+    expect(eqOnlyCombos).toEqual([]);
+    expect(calcState.zapLevel).toBe(14); // Level preserved when toggled off
+  });
+
+  it('persists and reloads zapEnabled and eqEnabled in localStorage', () => {
+    calcState.setAttackerTH(19);
+    calcState.zapEnabled = false;
+    calcState.eqEnabled = true;
+    calcState.saveToStorage();
+
+    calcState.zapEnabled = true;
+    calcState.eqEnabled = false;
+    calcState.loadFromStorage();
+
+    expect(calcState.zapEnabled).toBe(false);
+    expect(calcState.eqEnabled).toBe(true);
+    expect(calcState.zapLevel).toBe(14);
+  });
+
+  it('renders clickable on/off spell cards in DamageSourcesBar and hides slider when disabled', () => {
+    calcState.setAttackerTH(19);
+    calcState.zapEnabled = true;
+    calcState.eqEnabled = false;
+
+    const { body } = render(DamageSourcesBar);
+    expect(body).toContain('1 active');
+    expect(body).toContain('aria-pressed="true"');
+    expect(body).toContain('aria-pressed="false"');
+    expect(body).toContain('id="zap-level-input"');
+    expect(body).not.toContain('id="eq-level-input"');
   });
 
   it('renders Lightning Spell slider with max="14" and Town Hall icon fallback in DamageSourcesBar', () => {

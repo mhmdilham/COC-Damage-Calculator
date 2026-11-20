@@ -10,6 +10,10 @@
   let isAttackerDropdownOpen = $state(false);
   let attackerDropdownRef = $state<HTMLElement | null>(null);
 
+  const activeSpellCount = $derived(
+    (calcState.zapEnabled ? 1 : 0) + (calcState.eqEnabled ? 1 : 0)
+  );
+
   const activeEquipCount = $derived(
     Object.values(calcState.equipments).filter((e) => e.enabled).length
   );
@@ -17,6 +21,15 @@
   function selectAttackerTH(th: TownHallLevel) {
     calcState.setAttackerTH(th);
     isAttackerDropdownOpen = false;
+  }
+
+  function toggleSpell(spell: 'zap' | 'eq') {
+    if (spell === 'zap') {
+      calcState.zapEnabled = !calcState.zapEnabled;
+    } else {
+      calcState.eqEnabled = !calcState.eqEnabled;
+    }
+    calcState.saveToStorage();
   }
 
   function toggleEquipment(id: string) {
@@ -125,78 +138,174 @@
   <!-- 1. Attacker Spells (Zap & Quake) -->
   <div class="space-y-2">
     <div class="flex items-center justify-between text-xs">
-      <span class="font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5 text-[11px]">
-        <span>⚡</span> ZapQuake
-      </span>
-      <span class="text-[11px] text-slate-500">
-        Spell Damage
-      </span>
+      <div class="flex items-center gap-2">
+        <span class="font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5 text-[11px]">
+          <span>⚡</span> ZapQuake
+        </span>
+        <span class="text-[10px] font-bold px-1.5 py-0.5 rounded-md border {activeSpellCount > 0 ? 'bg-amber-900/40 border-amber-700/60 text-amber-300' : 'bg-slate-900 border-slate-800 text-slate-500'}">
+          {activeSpellCount} active
+        </span>
+      </div>
+
+      {#if activeSpellCount > 0}
+        <button
+          type="button"
+          onclick={() => {
+            calcState.zapEnabled = false;
+            calcState.eqEnabled = false;
+            calcState.saveToStorage();
+          }}
+          class="text-[11px] text-slate-400 hover:text-rose-400 underline cursor-pointer transition-colors"
+        >
+          Disable All
+        </button>
+      {:else}
+        <span class="text-[11px] text-slate-500 hidden sm:inline">
+          Enable spell to calculate combos
+        </span>
+      {/if}
     </div>
 
     <!-- Attacker Spells Grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
       <!-- Lightning Spell -->
-      <div class="bg-[#181a20] border border-slate-800 rounded-xl p-3 flex items-center gap-3">
-        <img
-          src={SPELLS.lightning_spell.icon}
-          alt="Zap"
-          width="40"
-          height="40"
-          class="w-10 h-10 aspect-square object-contain rounded-lg shrink-0 drop-shadow"
-        />
-
-        <div class="flex-1 min-w-0">
-          <div class="flex items-center justify-between text-xs">
-            <label for="zap-level-input" class="font-bold text-white truncate cursor-pointer">Lightning (Zap)</label>
-            <span class="font-bold text-amber-400">
-              Lv {calcState.zapLevel} ({SPELLS.lightning_spell.damage[calcState.zapLevel] ?? 0} DMG)
+      <div
+        role="button"
+        tabindex="0"
+        aria-pressed={calcState.zapEnabled}
+        onclick={() => toggleSpell('zap')}
+        onkeydown={(e) => {
+          if (e.target === e.currentTarget && (e.key === 'Enter' || e.key === ' ')) {
+            e.preventDefault();
+            toggleSpell('zap');
+          }
+        }}
+        class="p-2.5 rounded-xl border transition-all cursor-pointer select-none text-left {calcState.zapEnabled
+          ? 'bg-amber-950/25 border-amber-500/70 text-white shadow-sm shadow-amber-950/40 ring-1 ring-amber-500/30'
+          : 'bg-[#181a20] border-slate-800 text-slate-400 hover:border-slate-700 hover:bg-[#1c1e26]'}"
+      >
+        <!-- Info Header -->
+        <div class="flex items-center justify-between gap-2">
+          <div class="flex items-center gap-2 min-w-0 flex-1">
+            <img
+              src={SPELLS.lightning_spell.icon}
+              alt="Zap"
+              width="24"
+              height="24"
+              class="w-6 h-6 aspect-square object-contain rounded shrink-0 drop-shadow"
+            />
+            <span class="text-xs font-semibold truncate {calcState.zapEnabled ? 'text-white' : 'text-slate-300'}">
+              Lightning (Zap)
             </span>
           </div>
 
-          <div class="flex items-center gap-2 pt-1">
+          <span class="text-[9px] uppercase font-bold px-1.5 py-0.5 rounded shrink-0 {calcState.zapEnabled ? 'bg-amber-900/50 text-amber-300 border border-amber-700/60' : 'bg-slate-800 text-slate-400'}">
+            {calcState.zapEnabled ? 'on' : 'off'}
+          </span>
+        </div>
+
+        <!-- Level & Damage -->
+        <div class="mt-2 pt-2 border-t border-slate-800/80 flex items-center justify-between text-[11px]">
+          <span class="text-slate-400">
+            Lv {calcState.zapLevel}
+          </span>
+          <span class="font-bold {calcState.zapEnabled ? 'text-amber-400' : 'text-slate-500'}">
+            {SPELLS.lightning_spell.damage[calcState.zapLevel] ?? 0} DMG
+          </span>
+        </div>
+
+        <!-- Level slider if enabled -->
+        {#if calcState.zapEnabled}
+          <!-- svelte-ignore a11y_no_static_element_interactions -->
+          <div
+            class="pt-1"
+            onclick={(e) => e.stopPropagation()}
+            onpointerdown={(e) => e.stopPropagation()}
+            onkeydown={(e) => e.stopPropagation()}
+          >
+            <label for="zap-level-input" class="sr-only">Level Lightning (Zap)</label>
             <input
               id="zap-level-input"
               name="zap-level"
               type="range"
-              min="0"
+              min="1"
               max={SPELLS.lightning_spell.maxLevel}
               bind:value={calcState.zapLevel}
-              class="w-full accent-amber-500 cursor-pointer h-2 bg-slate-850 rounded-lg"
+              oninput={() => calcState.saveToStorage()}
+              class="w-full accent-amber-500 cursor-pointer h-1.5 bg-slate-900 rounded-lg"
             />
           </div>
-        </div>
+        {/if}
       </div>
 
       <!-- Earthquake Spell -->
-      <div class="bg-[#181a20] border border-slate-800 rounded-xl p-3 flex items-center gap-3">
-        <img
-          src={SPELLS.earthquake_spell.icon}
-          alt="Quake"
-          width="40"
-          height="40"
-          class="w-10 h-10 aspect-square object-contain rounded-lg shrink-0 drop-shadow"
-        />
-
-        <div class="flex-1 min-w-0">
-          <div class="flex items-center justify-between text-xs">
-            <label for="eq-level-input" class="font-bold text-white truncate cursor-pointer">Earthquake (Quake)</label>
-            <span class="font-bold text-amber-400">
-              Lv {calcState.eqLevel} ({SPELLS.earthquake_spell.damage[calcState.eqLevel] ?? 0}% HP)
+      <div
+        role="button"
+        tabindex="0"
+        aria-pressed={calcState.eqEnabled}
+        onclick={() => toggleSpell('eq')}
+        onkeydown={(e) => {
+          if (e.target === e.currentTarget && (e.key === 'Enter' || e.key === ' ')) {
+            e.preventDefault();
+            toggleSpell('eq');
+          }
+        }}
+        class="p-2.5 rounded-xl border transition-all cursor-pointer select-none text-left {calcState.eqEnabled
+          ? 'bg-amber-950/25 border-amber-500/70 text-white shadow-sm shadow-amber-950/40 ring-1 ring-amber-500/30'
+          : 'bg-[#181a20] border-slate-800 text-slate-400 hover:border-slate-700 hover:bg-[#1c1e26]'}"
+      >
+        <!-- Info Header -->
+        <div class="flex items-center justify-between gap-2">
+          <div class="flex items-center gap-2 min-w-0 flex-1">
+            <img
+              src={SPELLS.earthquake_spell.icon}
+              alt="Quake"
+              width="24"
+              height="24"
+              class="w-6 h-6 aspect-square object-contain rounded shrink-0 drop-shadow"
+            />
+            <span class="text-xs font-semibold truncate {calcState.eqEnabled ? 'text-white' : 'text-slate-300'}">
+              Earthquake (Quake)
             </span>
           </div>
 
-          <div class="flex items-center gap-2 pt-1">
+          <span class="text-[9px] uppercase font-bold px-1.5 py-0.5 rounded shrink-0 {calcState.eqEnabled ? 'bg-amber-900/50 text-amber-300 border border-amber-700/60' : 'bg-slate-800 text-slate-400'}">
+            {calcState.eqEnabled ? 'on' : 'off'}
+          </span>
+        </div>
+
+        <!-- Level & Damage -->
+        <div class="mt-2 pt-2 border-t border-slate-800/80 flex items-center justify-between text-[11px]">
+          <span class="text-slate-400">
+            Lv {calcState.eqLevel}
+          </span>
+          <span class="font-bold {calcState.eqEnabled ? 'text-amber-400' : 'text-slate-500'}">
+            {SPELLS.earthquake_spell.damage[calcState.eqLevel] ?? 0}% HP
+          </span>
+        </div>
+
+        <!-- Level slider if enabled -->
+        {#if calcState.eqEnabled}
+          <!-- svelte-ignore a11y_no_static_element_interactions -->
+          <div
+            class="pt-1"
+            onclick={(e) => e.stopPropagation()}
+            onpointerdown={(e) => e.stopPropagation()}
+            onkeydown={(e) => e.stopPropagation()}
+          >
+            <label for="eq-level-input" class="sr-only">Level Earthquake (Quake)</label>
             <input
               id="eq-level-input"
               name="eq-level"
               type="range"
-              min="0"
+              min="1"
               max="5"
               bind:value={calcState.eqLevel}
-              class="w-full accent-amber-500 cursor-pointer h-2 bg-slate-850 rounded-lg"
+              oninput={() => calcState.saveToStorage()}
+              class="w-full accent-amber-500 cursor-pointer h-1.5 bg-slate-900 rounded-lg"
             />
           </div>
-        </div>
+        {/if}
       </div>
     </div>
   </div>
