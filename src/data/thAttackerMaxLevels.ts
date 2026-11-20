@@ -222,5 +222,17 @@ export const TH_ATTACKER_MAX_LEVELS: Record<TownHallLevel, AttackerThMaxLevels> 
       "rocket_backpack": 27,
       "flame_blower": 18
     }
+  },
+  "19": {
+    "zapLevel": 14,
+    "eqLevel": 5,
+    "equipments": {
+      "spiky_ball": 27,
+      "giant_arrow": 18,
+      "fireball": 27,
+      "seeking_shield": 18,
+      "rocket_backpack": 27,
+      "flame_blower": 18
+    }
   }
 };

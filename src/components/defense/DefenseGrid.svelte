@@ -5,7 +5,7 @@
   import EquipmentBadge from '../ui/EquipmentBadge.svelte';
 
   const thLevelsDescending: TownHallLevel[] = [
-    18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1,
+    19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1,
   ];
 
   let isDefenderDropdownOpen = $state(false);
@@ -31,6 +31,8 @@
 
   const KEY_DEFENSES_ORDER = [
     'townhall',
+    'firecracker_tower',
+    'spiky_tower',
     'revenge_tower',
     'clan_castle',
     'monolith',
@@ -213,6 +215,11 @@
             width="20"
             height="20"
             class="w-5 h-5 aspect-square object-contain drop-shadow"
+            onerror={(e) => {
+              const img = e.currentTarget as HTMLImageElement;
+              img.onerror = null;
+              img.src = '/images/defense/townhall/18.webp';
+            }}
           />
           <span class="text-sm font-extrabold text-white tracking-tight leading-none">
             TH {calcState.targetThLevel}
@@ -240,6 +247,11 @@
                   width="18"
                   height="18"
                   class="w-[18px] h-[18px] aspect-square object-contain drop-shadow shrink-0"
+                  onerror={(e) => {
+                    const img = e.currentTarget as HTMLImageElement;
+                    img.onerror = null;
+                    img.src = '/images/defense/townhall/18.webp';
+                  }}
                 />
                 <span class="text-xs font-bold whitespace-nowrap">
                   Town Hall {th}

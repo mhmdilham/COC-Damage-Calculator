@@ -280,22 +280,23 @@ describe('CoC Damage Calculator Engine', () => {
       // At unlockedAtTH, max level must match initialMax
       expect(getMaxBuildingLevel(spec.id, spec.unlockedAtTH as TownHallLevel)).toBe(spec.initialMax);
 
-      // At TH 18, all heroes should have their highest level
-      expect(getMaxBuildingLevel(spec.id, 18 as TownHallLevel)).toBe(hero.hp.length);
+      // At TH 19, all heroes should have their highest level
+      expect(getMaxBuildingLevel(spec.id, 19 as TownHallLevel)).toBe(hero.hp.length);
     }
   });
 
   it('validates Builder\'s Hut and Monolith level progression matching official data', async () => {
     const { getMaxBuildingLevel } = await import('../data/thBuildingMaxLevels');
 
-    // Builder's Hut
+    // Builder's Hut (Supercharge removed at TH 19; Lv 9 is permanent at TH 19)
     expect(getMaxBuildingLevel('builders_hut', 10 as TownHallLevel)).toBe(1);
     expect(getMaxBuildingLevel('builders_hut', 13 as TownHallLevel)).toBe(1);
     expect(getMaxBuildingLevel('builders_hut', 14 as TownHallLevel)).toBe(4);
     expect(getMaxBuildingLevel('builders_hut', 15 as TownHallLevel)).toBe(5);
     expect(getMaxBuildingLevel('builders_hut', 16 as TownHallLevel)).toBe(6);
     expect(getMaxBuildingLevel('builders_hut', 17 as TownHallLevel)).toBe(7);
-    expect(getMaxBuildingLevel('builders_hut', 18 as TownHallLevel)).toBe(9); // 8 + Supercharge
+    expect(getMaxBuildingLevel('builders_hut', 18 as TownHallLevel)).toBe(8);
+    expect(getMaxBuildingLevel('builders_hut', 19 as TownHallLevel)).toBe(9);
 
     // Monolith
     expect(getMaxBuildingLevel('monolith', 14 as TownHallLevel)).toBe(0);
@@ -303,6 +304,7 @@ describe('CoC Damage Calculator Engine', () => {
     expect(getMaxBuildingLevel('monolith', 16 as TownHallLevel)).toBe(3);
     expect(getMaxBuildingLevel('monolith', 17 as TownHallLevel)).toBe(4);
     expect(getMaxBuildingLevel('monolith', 18 as TownHallLevel)).toBe(6); // 5 + Supercharge
+    expect(getMaxBuildingLevel('monolith', 19 as TownHallLevel)).toBe(6);
   });
 
   it('validates Attacker max levels per Town Hall (Spells and Equipment from Fandom data)', async () => {
@@ -359,5 +361,129 @@ describe('CoC Damage Calculator Engine', () => {
     expect(th18.equipments.seeking_shield).toBe(18);
     expect(th18.equipments.rocket_backpack).toBe(27);
     expect(th18.equipments.flame_blower).toBe(18);
+  });
+
+  it('supports Lightning Spell Level 14 (760 DMG) and TH 19 attacker max levels', async () => {
+    const { SPELLS } = await import('../data/offenses');
+    const { TH_ATTACKER_MAX_LEVELS } = await import('../data/thAttackerMaxLevels');
+
+    expect(SPELLS.lightning_spell.maxLevel).toBe(14);
+    expect(SPELLS.lightning_spell.damage[14]).toBe(760);
+
+    const th19 = TH_ATTACKER_MAX_LEVELS[19 as TownHallLevel];
+    expect(th19).toBeDefined();
+    expect(th19.zapLevel).toBe(14);
+    expect(th19.eqLevel).toBe(5);
+    expect(th19.equipments.spiky_ball).toBe(27);
+    expect(th19.equipments.giant_arrow).toBe(18);
+    expect(th19.equipments.fireball).toBe(27);
+    expect(th19.equipments.seeking_shield).toBe(18);
+    expect(th19.equipments.rocket_backpack).toBe(27);
+    expect(th19.equipments.flame_blower).toBe(18);
+  });
+
+  it('validates new TH 19 defenses (Spiky Tower & Firecracker Tower) HP, unlock TH, and combos', async () => {
+    const { getMaxBuildingLevel } = await import('../data/thBuildingMaxLevels');
+
+    const spiky = DEFENSES.spiky_tower;
+    expect(spiky).toBeDefined();
+    expect(spiky.unlockedAtTH).toBe(19);
+    expect(spiky.hp).toEqual([5959, 6363]);
+    expect(spiky.immune).toEqual([]);
+    expect(getMaxBuildingLevel('spiky_tower', 18)).toBe(0);
+    expect(getMaxBuildingLevel('spiky_tower', 19)).toBe(2);
+
+    const firecracker = DEFENSES.firecracker_tower;
+    expect(firecracker).toBeDefined();
+    expect(firecracker.unlockedAtTH).toBe(19);
+    expect(firecracker.hp).toEqual([6500, 6700]);
+    expect(firecracker.immune).toEqual([]);
+    expect(getMaxBuildingLevel('firecracker_tower', 18)).toBe(0);
+    expect(getMaxBuildingLevel('firecracker_tower', 19)).toBe(2);
+
+    // Firecracker Lv 2 (6700 HP) with 1 EQ Lv 5 (29% = 1943) -> remaining 4757 -> 7 Zap Lv 14 (5320) = 8 slots
+    const combos = calculateCombos({
+      defense: firecracker,
+      defenseLevel: 2,
+      zapLevel: 14,
+      eqLevel: 5,
+      equipments: [],
+      maxSpellSpace: 11,
+    });
+    const oneEq = combos.find((c) => c.eqCount === 1);
+    expect(oneEq?.zapCount).toBe(7);
+    expect(oneEq?.totalSpellSpace).toBe(8);
+
+    // Giant Arrow deals 1x (not 2x) to Spiky Tower
+    const gaCheck = calculateCombos({
+      defense: spiky,
+      defenseLevel: 2,
+      zapLevel: 14,
+      eqLevel: 0,
+      equipments: [{ id: 'giant_arrow', level: 18, enabled: true }],
+      maxSpellSpace: 11,
+    });
+    expect(gaCheck[0].damageBreakdown.heroEquipmentDamage).toBe(1500);
+  });
+
+  it('validates TH 19 building upgrades, supercharge removal, and 6 hero max HP', async () => {
+    const { getMaxBuildingLevel } = await import('../data/thBuildingMaxLevels');
+
+    // Town Hall 19 & Clan Castle 15
+    expect(getMaxBuildingLevel('townhall', 19)).toBe(19);
+    expect(DEFENSES.townhall.hp[18]).toBe(11200);
+    expect(DEFENSES.townhall.immune).toContain('lightning_spell');
+
+    expect(getMaxBuildingLevel('clan_castle', 19)).toBe(15);
+    expect(DEFENSES.clan_castle.hp[14]).toBe(6200);
+    expect(DEFENSES.clan_castle.immune).toContain('lightning_spell');
+
+    // Air Defense Lv 17 (2150 HP) + Giant Arrow 2x multiplier (3000 DMG -> 0 spells)
+    expect(getMaxBuildingLevel('air_defense', 19)).toBe(17);
+    expect(DEFENSES.air_defense.hp[16]).toBe(2150);
+    const ad17Combo = calculateCombos({
+      defense: DEFENSES.air_defense,
+      defenseLevel: 17,
+      zapLevel: 14,
+      eqLevel: 0,
+      equipments: [{ id: 'giant_arrow', level: 18, enabled: true }],
+      maxSpellSpace: 11,
+    });
+    expect(ad17Combo[0].totalSpellSpace).toBe(0);
+    expect(ad17Combo[0].damageBreakdown.heroEquipmentDamage).toBe(3000);
+
+    // 6 defenses promoted from TH 18 supercharge to permanent TH 19 levels
+    const promoted = [
+      { id: 'ricochet_cannon', th18: 4, th19: 5, hp19: 6500 },
+      { id: 'multiarcher_tower', th18: 4, th19: 5, hp19: 5900 },
+      { id: 'multigear_tower', th18: 3, th19: 4, hp19: 4700 },
+      { id: 'builders_hut', th18: 8, th19: 9, hp19: 2200 },
+      { id: 'xbow', th18: 13, th19: 14, hp19: 5200 },
+      { id: 'hidden_tesla', th18: 17, th19: 18, hp19: 1850 },
+    ] as const;
+
+    for (const item of promoted) {
+      const def = DEFENSES[item.id];
+      expect(def.superchargeLevel).toBeUndefined();
+      expect(getMaxBuildingLevel(item.id, 18)).toBe(item.th18);
+      expect(getMaxBuildingLevel(item.id, 19)).toBe(item.th19);
+      expect(def.hp[item.th19 - 1]).toBe(item.hp19);
+    }
+
+    // 6 Heroes TH 18 & TH 19 max levels and HP
+    const heroMax = [
+      { id: 'barbarian_king', th18: 110, th19: 115, hp19: 13975 },
+      { id: 'archer_queen', th18: 110, th19: 115, hp19: 3696 },
+      { id: 'minion_prince', th18: 95, th19: 100, hp19: 4660 },
+      { id: 'grand_warden', th18: 85, th19: 90, hp19: 2754 },
+      { id: 'royal_champion', th18: 55, th19: 60, hp19: 4428 },
+      { id: 'dragon_duke', th18: 25, th19: 30, hp19: 11275 },
+    ] as const;
+
+    for (const h of heroMax) {
+      expect(getMaxBuildingLevel(h.id, 18)).toBe(h.th18);
+      expect(getMaxBuildingLevel(h.id, 19)).toBe(h.th19);
+      expect(DEFENSES[h.id].hp[h.th19 - 1]).toBe(h.hp19);
+    }
   });
 });

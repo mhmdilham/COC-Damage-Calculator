@@ -74,7 +74,8 @@ export const TH_BUILDING_MAX: Record<string, Partial<Record<TownHallLevel, numbe
     "15": 13,
     "16": 14,
     "17": 15,
-    "18": 16
+    "18": 16,
+    "19": 17
   },
   "wizard_tower": {
     "5": 2,
@@ -119,7 +120,8 @@ export const TH_BUILDING_MAX: Record<string, Partial<Record<TownHallLevel, numbe
     "15": 14,
     "16": 15,
     "17": 16,
-    "18": 18
+    "18": 17,
+    "19": 18
   },
   "bomb_tower": {
     "8": 2,
@@ -144,7 +146,8 @@ export const TH_BUILDING_MAX: Record<string, Partial<Record<TownHallLevel, numbe
     "15": 10,
     "16": 11,
     "17": 12,
-    "18": 14
+    "18": 13,
+    "19": 14
   },
   "inferno_tower": {
     "10": 3,
@@ -193,7 +196,8 @@ export const TH_BUILDING_MAX: Record<string, Partial<Record<TownHallLevel, numbe
     "15": 5,
     "16": 6,
     "17": 7,
-    "18": 9
+    "18": 8,
+    "19": 9
   },
   "spell_tower": {
     "15": 3,
@@ -210,12 +214,14 @@ export const TH_BUILDING_MAX: Record<string, Partial<Record<TownHallLevel, numbe
   "ricochet_cannon": {
     "16": 2,
     "17": 3,
-    "18": 5
+    "18": 4,
+    "19": 5
   },
   "multiarcher_tower": {
     "16": 2,
     "17": 3,
-    "18": 5
+    "18": 4,
+    "19": 5
   },
   "firespitter": {
     "17": 2,
@@ -223,13 +229,20 @@ export const TH_BUILDING_MAX: Record<string, Partial<Record<TownHallLevel, numbe
   },
   "multigear_tower": {
     "17": 2,
-    "18": 4
+    "18": 3,
+    "19": 4
   },
   "super_wizard_tower": {
     "18": 3
   },
   "revenge_tower": {
     "18": 3
+  },
+  "spiky_tower": {
+    "19": 2
+  },
+  "firecracker_tower": {
+    "19": 2
   },
   "townhall": {
     "1": 1,
@@ -249,7 +262,8 @@ export const TH_BUILDING_MAX: Record<string, Partial<Record<TownHallLevel, numbe
     "15": 15,
     "16": 16,
     "17": 17,
-    "18": 18
+    "18": 18,
+    "19": 19
   },
   "clan_castle": {
     "3": 1,
@@ -267,7 +281,8 @@ export const TH_BUILDING_MAX: Record<string, Partial<Record<TownHallLevel, numbe
     "15": 11,
     "16": 12,
     "17": 13,
-    "18": 14
+    "18": 14,
+    "19": 15
   },
   "barbarian_king": {
     "7": 10,
@@ -281,7 +296,8 @@ export const TH_BUILDING_MAX: Record<string, Partial<Record<TownHallLevel, numbe
     "15": 90,
     "16": 95,
     "17": 100,
-    "18": 110
+    "18": 110,
+    "19": 115
   },
   "archer_queen": {
     "8": 10,
@@ -294,7 +310,8 @@ export const TH_BUILDING_MAX: Record<string, Partial<Record<TownHallLevel, numbe
     "15": 90,
     "16": 95,
     "17": 100,
-    "18": 110
+    "18": 110,
+    "19": 115
   },
   "minion_prince": {
     "9": 10,
@@ -306,7 +323,8 @@ export const TH_BUILDING_MAX: Record<string, Partial<Record<TownHallLevel, numbe
     "15": 70,
     "16": 80,
     "17": 90,
-    "18": 95
+    "18": 95,
+    "19": 100
   },
   "grand_warden": {
     "11": 20,
@@ -316,7 +334,8 @@ export const TH_BUILDING_MAX: Record<string, Partial<Record<TownHallLevel, numbe
     "15": 65,
     "16": 70,
     "17": 75,
-    "18": 85
+    "18": 85,
+    "19": 90
   },
   "royal_champion": {
     "13": 25,
@@ -324,13 +343,15 @@ export const TH_BUILDING_MAX: Record<string, Partial<Record<TownHallLevel, numbe
     "15": 40,
     "16": 45,
     "17": 50,
-    "18": 55
+    "18": 55,
+    "19": 60
   },
   "dragon_duke": {
     "15": 10,
     "16": 15,
     "17": 20,
-    "18": 25
+    "18": 25,
+    "19": 30
   },
   "hero_bell": {
     "11": 1,

@@ -1,22 +1,35 @@
 import { DEFENSES } from '../data/defenses';
+import { SPELLS } from '../data/offenses';
 import { getMaxBuildingLevel } from '../data/thBuildingMaxLevels';
 import { TH_ATTACKER_MAX_LEVELS } from '../data/thAttackerMaxLevels';
 import { calculateCombos } from '../engine/calculator';
 import type { TownHallLevel, ActiveEquipmentConfig, ComboResult, DefenseData } from '../engine/types';
+
+const STORAGE_SCHEMA_VERSION = 3;
+const TH19_PROMOTED_FROM_SUPERCHARGE = [
+  'ricochet_cannon',
+  'multiarcher_tower',
+  'multigear_tower',
+  'builders_hut',
+  'xbow',
+  'hidden_tesla',
+] as const;
 
 class CalculatorState {
   // Target Village Town Hall Level (sets all defenses to max for this TH)
   targetThLevel = $state<TownHallLevel>(16);
 
   // Attacker Town Hall Level (sets spells & equipment to max for this TH)
-  attackerThLevel = $state<TownHallLevel>(18);
+  attackerThLevel = $state<TownHallLevel>(19);
 
   // Modal inspection: which defense is currently opened in modal
   selectedDefenseId = $state<string | null>(null);
 
-  // Attacker Spell Levels (unrestricted by target TH, default max)
-  zapLevel = $state<number>(13);
+  // Attacker Spell Levels & Toggles (unrestricted by target TH, default max & enabled)
+  zapLevel = $state<number>(14);
+  zapEnabled = $state<boolean>(true);
   eqLevel = $state<number>(5);
+  eqEnabled = $state<boolean>(true);
 
   // Attacker Hero Equipments (all unlocked and default max levels)
   equipments = $state<Record<string, { level: number; enabled: boolean }>>({
@@ -63,8 +76,18 @@ class CalculatorState {
     this.attackerThLevel = th;
     const maxData = TH_ATTACKER_MAX_LEVELS[th];
     if (maxData) {
-      this.zapLevel = maxData.zapLevel;
-      this.eqLevel = maxData.eqLevel;
+      if (maxData.zapLevel > 0) {
+        this.zapLevel = maxData.zapLevel;
+      } else {
+        this.zapLevel = 1;
+        this.zapEnabled = false;
+      }
+      if (maxData.eqLevel > 0) {
+        this.eqLevel = maxData.eqLevel;
+      } else {
+        this.eqLevel = 1;
+        this.eqEnabled = false;
+      }
       for (const [eqId, maxLv] of Object.entries(maxData.equipments)) {
         if (this.equipments[eqId]) {
           if (maxLv > 0) {
@@ -131,8 +154,8 @@ class CalculatorState {
     return calculateCombos({
       defense,
       defenseLevel: currentLevel,
-      zapLevel: this.zapLevel,
-      eqLevel: this.eqLevel,
+      zapLevel: this.zapEnabled ? this.zapLevel : 0,
+      eqLevel: this.eqEnabled ? this.eqLevel : 0,
       equipments: this.activeEquipmentsList,
       maxSpellSpace: 11, // Standard maximum spell capacity (army camp + CC)
     });
@@ -148,10 +171,13 @@ class CalculatorState {
     if (typeof window === 'undefined') return;
     try {
       const data = {
+        schemaVersion: STORAGE_SCHEMA_VERSION,
         targetThLevel: this.targetThLevel,
         attackerThLevel: this.attackerThLevel,
         zapLevel: this.zapLevel,
+        zapEnabled: this.zapEnabled,
         eqLevel: this.eqLevel,
+        eqEnabled: this.eqEnabled,
         equipments: this.equipments,
         defenseLevels: this.defenseLevels,
       };
@@ -167,14 +193,49 @@ class CalculatorState {
       const raw = localStorage.getItem('coc_calc_prefs_v2');
       if (!raw) return;
       const data = JSON.parse(raw);
-      if (data.targetThLevel && data.targetThLevel >= 1 && data.targetThLevel <= 18) {
-        this.targetThLevel = data.targetThLevel;
+      const schemaVersion = typeof data.schemaVersion === 'number' ? data.schemaVersion : 2;
+
+      if (
+        typeof data.targetThLevel === 'number' &&
+        Number.isInteger(data.targetThLevel) &&
+        data.targetThLevel >= 1 &&
+        data.targetThLevel <= 19
+      ) {
+        this.targetThLevel = data.targetThLevel as TownHallLevel;
+        this.initDefenseLevels(this.targetThLevel);
       }
-      if (data.attackerThLevel && data.attackerThLevel >= 1 && data.attackerThLevel <= 18) {
-        this.attackerThLevel = data.attackerThLevel;
+      if (
+        typeof data.attackerThLevel === 'number' &&
+        Number.isInteger(data.attackerThLevel) &&
+        data.attackerThLevel >= 1 &&
+        data.attackerThLevel <= 19
+      ) {
+        this.attackerThLevel = data.attackerThLevel as TownHallLevel;
       }
-      if (typeof data.zapLevel === 'number') this.zapLevel = data.zapLevel;
-      if (typeof data.eqLevel === 'number') this.eqLevel = data.eqLevel;
+      if (typeof data.zapEnabled === 'boolean') {
+        this.zapEnabled = data.zapEnabled;
+      }
+      if (typeof data.zapLevel === 'number' && Number.isFinite(data.zapLevel)) {
+        const roundedZap = Math.round(data.zapLevel);
+        if (roundedZap <= 0) {
+          if (typeof data.zapEnabled !== 'boolean') this.zapEnabled = false;
+          this.zapLevel = 1;
+        } else {
+          this.zapLevel = Math.min(roundedZap, SPELLS.lightning_spell.maxLevel);
+        }
+      }
+      if (typeof data.eqEnabled === 'boolean') {
+        this.eqEnabled = data.eqEnabled;
+      }
+      if (typeof data.eqLevel === 'number' && Number.isFinite(data.eqLevel)) {
+        const roundedEq = Math.round(data.eqLevel);
+        if (roundedEq <= 0) {
+          if (typeof data.eqEnabled !== 'boolean') this.eqEnabled = false;
+          this.eqLevel = 1;
+        } else {
+          this.eqLevel = Math.min(roundedEq, 5);
+        }
+      }
       if (data.equipments && typeof data.equipments === 'object') {
         for (const [k, v] of Object.entries(data.equipments)) {
           if (k in this.equipments && typeof v === 'object' && v !== null) {
@@ -183,7 +244,27 @@ class CalculatorState {
         }
       }
       if (data.defenseLevels && typeof data.defenseLevels === 'object') {
-        this.defenseLevels = { ...this.defenseLevels, ...data.defenseLevels };
+        const merged = { ...this.defenseLevels };
+        for (const [id, rawLevel] of Object.entries(data.defenseLevels)) {
+          const def = DEFENSES[id];
+          if (def && typeof rawLevel === 'number' && Number.isFinite(rawLevel)) {
+            merged[id] = Math.max(1, Math.min(Math.round(rawLevel), def.hp.length));
+          }
+        }
+        this.defenseLevels = merged;
+      }
+
+      // Migrate pre-TH19 storage: promoted buildings no longer have TH 18 supercharges
+      if (schemaVersion < STORAGE_SCHEMA_VERSION) {
+        if (this.targetThLevel <= 18) {
+          for (const id of TH19_PROMOTED_FROM_SUPERCHARGE) {
+            const maxForTh = getMaxBuildingLevel(id, this.targetThLevel);
+            if (maxForTh > 0 && (this.defenseLevels[id] ?? 1) > maxForTh) {
+              this.defenseLevels[id] = maxForTh;
+            }
+          }
+        }
+        this.saveToStorage();
       }
     } catch {
       // ignore

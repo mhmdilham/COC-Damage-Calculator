@@ -18,4 +18,9 @@
 
   <!-- Detail / Available Combos Modal (Replicating Clashify Modal) -->
   <DefenseModal />
+
+  <footer class="border-t border-slate-800/80 py-3 px-3 sm:px-5 text-center text-[11px] text-slate-500">
+    Data synced with <span class="text-slate-300 font-semibold">Clash of Clans — The Clash of Titans (TH 19)</span>
+    &bull; Patch <span class="text-amber-400/90 font-semibold">v19.32.4</span> &bull; 16 Nov 2026
+  </footer>
 </div>
