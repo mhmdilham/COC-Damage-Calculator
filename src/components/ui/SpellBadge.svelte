@@ -1,5 +1,6 @@
 <script lang="ts">
   import { SPELLS } from '../../data/offenses';
+  import { getResponsiveSrcSet } from '../../lib/images';
 
   interface Props {
     spellId: 'lightning_spell' | 'earthquake_spell';
@@ -11,7 +12,7 @@
   let { spellId, count, level, size = 'md' }: Props = $props();
 
   const spell = $derived(SPELLS[spellId]);
-  
+
   const dimClasses = $derived(
     size === 'sm'
       ? 'w-10 h-10'
@@ -19,6 +20,8 @@
       ? 'w-14 h-14'
       : 'w-12 h-12'
   );
+
+  const imgPx = $derived(size === 'sm' ? 40 : size === 'lg' ? 56 : 48);
 
   const countBadgeClasses = $derived(
     size === 'sm'
@@ -41,9 +44,10 @@
   <!-- Spell Icon -->
   <img
     src={spell.icon}
+    srcset={getResponsiveSrcSet(spell.icon)}
     alt={spell.name}
-    width="48"
-    height="48"
+    width={imgPx}
+    height={imgPx}
     class="w-full h-full aspect-square object-cover p-1 scale-105"
     decoding="async"
   />

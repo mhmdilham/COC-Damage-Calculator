@@ -9,7 +9,9 @@
     "preview": "vite preview",
     "test": "vitest run",
     "check": "svelte-check --tsconfig ./tsconfig.app.json && tsc -p tsconfig.node.json",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "audit:images": "npx tsx scripts/audit-images.ts",
+    "optimize:images": "node scripts/optimize-images.ts"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
@@ -20,6 +22,7 @@
     "eslint": "^10.13.0",
     "eslint-plugin-svelte": "^3.23.1",
     "globals": "^17.13.0",
+    "sharp": "^0.35.5",
     "svelte": "^5.57.2",
     "svelte-check": "^4.7.7",
     "svelte-eslint-parser": "^1.10.0",

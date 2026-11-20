@@ -1,0 +1,19 @@
+# 1. Hashed JS & CSS dari Vite -> Cache 1 Tahun (immutable)
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# 2. Gambar Game -> Cache 30 Hari
+/images/*
+  Cache-Control: public, max-age=2592000, stale-while-revalidate=86400
+
+# 3. Service Worker & PWA Manifest -> Jangan di-cache lama agar update langsung terbaca
+/sw.js
+  Cache-Control: public, max-age=0, must-revalidate
+/registerSW.js
+  Cache-Control: public, max-age=0, must-revalidate
+/manifest.webmanifest
+  Cache-Control: public, max-age=0, must-revalidate
+
+# 4. Halaman HTML & Fallback -> Selalu revalidasi agar pengunjung dapat update terbaru
+/*
+  Cache-Control: public, max-age=0, must-revalidate

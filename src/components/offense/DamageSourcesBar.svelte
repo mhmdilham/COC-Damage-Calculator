@@ -2,6 +2,11 @@
   import { calcState } from '../../state/calculator.svelte';
   import { SPELLS, EQUIPMENTS } from '../../data/offenses';
   import type { TownHallLevel } from '../../engine/types';
+  import {
+    getTownHallIconSrc,
+    getVariantSrc,
+    handleTownHallImageError,
+  } from '../../lib/images';
 
   const thLevelsDescending: TownHallLevel[] = [
     19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1,
@@ -81,16 +86,13 @@
           title="Atur level maksimal spell & hero equipment sesuai TH penyerang"
         >
           <img
-            src="/images/defense/townhall/{calcState.attackerThLevel}.webp"
+            src={getTownHallIconSrc(calcState.attackerThLevel, 'sm')}
             alt="TH {calcState.attackerThLevel}"
             width="20"
             height="20"
             class="w-5 h-5 aspect-square object-contain drop-shadow"
-            onerror={(e) => {
-              const img = e.currentTarget as HTMLImageElement;
-              img.onerror = null;
-              img.src = '/images/defense/townhall/18.webp';
-            }}
+            decoding="async"
+            onerror={(e) => handleTownHallImageError(e, 'sm')}
           />
           <span class="text-sm font-extrabold text-white tracking-tight leading-none">
             TH {calcState.attackerThLevel}
@@ -104,7 +106,7 @@
           <div
             class="absolute right-0 top-full mt-1.5 z-50 w-[130px] max-h-64 overflow-y-auto bg-[#1f2127] border border-white/10 rounded-xl shadow-2xl p-1 space-y-0.5 scrollbar-thin"
           >
-            {#each thLevelsDescending as th (th)}
+            {#each thLevelsDescending as th, thIdx (th)}
               <button
                 type="button"
                 onclick={() => selectAttackerTH(th)}
@@ -113,16 +115,14 @@
                   : 'text-slate-300 hover:text-white hover:bg-[#282a32]'}"
               >
                 <img
-                  src="/images/defense/townhall/{th}.webp"
+                  src={getTownHallIconSrc(th, 'sm')}
                   alt="TH {th}"
                   width="18"
                   height="18"
                   class="w-[18px] h-[18px] aspect-square object-contain drop-shadow shrink-0"
-                  onerror={(e) => {
-                    const img = e.currentTarget as HTMLImageElement;
-                    img.onerror = null;
-                    img.src = '/images/defense/townhall/18.webp';
-                  }}
+                  loading={thIdx < 8 ? 'eager' : 'lazy'}
+                  decoding="async"
+                  onerror={(e) => handleTownHallImageError(e, 'sm')}
                 />
                 <span class="text-xs font-bold whitespace-nowrap">
                   Town Hall {th}
@@ -188,11 +188,12 @@
         <div class="flex items-center justify-between gap-2">
           <div class="flex items-center gap-2 min-w-0 flex-1">
             <img
-              src={SPELLS.lightning_spell.icon}
+              src={getVariantSrc(SPELLS.lightning_spell.icon, '@1x')}
               alt="Zap"
               width="24"
               height="24"
               class="w-6 h-6 aspect-square object-contain rounded shrink-0 drop-shadow"
+              decoding="async"
             />
             <span class="text-xs font-semibold truncate {calcState.zapEnabled ? 'text-white' : 'text-slate-300'}">
               Lightning (Zap)
@@ -258,11 +259,12 @@
         <div class="flex items-center justify-between gap-2">
           <div class="flex items-center gap-2 min-w-0 flex-1">
             <img
-              src={SPELLS.earthquake_spell.icon}
+              src={getVariantSrc(SPELLS.earthquake_spell.icon, '@1x')}
               alt="Quake"
               width="24"
               height="24"
               class="w-6 h-6 aspect-square object-contain rounded shrink-0 drop-shadow"
+              decoding="async"
             />
             <span class="text-xs font-semibold truncate {calcState.eqEnabled ? 'text-white' : 'text-slate-300'}">
               Earthquake (Quake)
@@ -367,11 +369,12 @@
           <div class="flex items-center justify-between gap-2">
             <div class="flex items-center gap-2 min-w-0 flex-1">
               <img
-                src={eq.icon}
+                src={getVariantSrc(eq.icon, '@1x')}
                 alt={eq.name}
                 width="24"
                 height="24"
                 class="w-6 h-6 aspect-square object-contain rounded shrink-0 drop-shadow"
+                decoding="async"
               />
               <span class="text-xs font-semibold truncate {config?.enabled ? 'text-white' : 'text-slate-300'}">
                 {eq.name}

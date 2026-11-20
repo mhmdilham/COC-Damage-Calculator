@@ -13,6 +13,8 @@ export interface DefenseData {
   // Map of TH -> max level available at that TH
   thMaxLevel?: Partial<Record<TownHallLevel, number>>;
   superchargeLevel?: number;
+  // Optional map of building level -> canonical sprite level (deduplicates identical tier sprites)
+  spriteLevelMap?: Record<number, number>;
 }
 
 export interface SpellData {

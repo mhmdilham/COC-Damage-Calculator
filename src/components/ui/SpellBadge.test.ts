@@ -46,5 +46,6 @@ describe('SpellBadge component', () => {
     });
     expect(lg.body).toContain('w-14 h-14');
     expect(lg.body).toContain('text-xs');
+    expect(lg.body).toContain('srcset="/images/offense/spells/earthquake_spell@1x.webp 1x, /images/offense/spells/earthquake_spell.webp 2x"');
   });
 });

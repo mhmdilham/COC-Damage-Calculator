@@ -204,16 +204,17 @@ describe('CalculatorState and TH 19 UI integration', () => {
     expect(body).not.toContain('id="eq-level-input"');
   });
 
-  it('renders Lightning Spell slider with max="14" and Town Hall icon fallback in DamageSourcesBar', () => {
+  it('renders Lightning Spell slider with max="14" and compact Town Hall icon fallback in DamageSourcesBar', () => {
     calcState.setAttackerTH(19);
     const { body } = render(DamageSourcesBar);
     expect(body).toContain('id="zap-level-input"');
     expect(body).toContain('max="14"');
     expect(body).toContain('TH 19');
-    expect(body).toMatch(/<img[^>]*src="\/images\/defense\/townhall\/19\.webp"[^>]*onerror=/);
+    expect(body).toMatch(/<img[^>]*src="\/images\/defense\/townhall\/19@sm\.webp"[^>]*onerror=/);
+    expect(body).toContain('src="/images/offense/spells/lightning_spell@1x.webp"');
   });
 
-  it('renders Spiky Tower, Firecracker Tower under Key Defenses and Town Hall icon fallback in DefenseGrid', () => {
+  it('renders Spiky Tower, Firecracker Tower under Key Defenses with srcset, lazy loading, and Town Hall icon fallback in DefenseGrid', () => {
     calcState.setTargetTH(19);
     calcState.activeCategory = 'key';
     calcState.searchQuery = '';
@@ -221,6 +222,9 @@ describe('CalculatorState and TH 19 UI integration', () => {
     expect(body).toContain('Firecracker Tower');
     expect(body).toContain('Spiky Tower');
     expect(body).toMatch(/<img[^>]*alt="TH 19"[^>]*onerror=/);
+    expect(body).toContain('@1x.webp 1x');
+    expect(body).toContain('loading="eager"');
+    expect(body).toContain('loading="lazy"');
   });
 
   it('displays official Supercell TH 19 patch version and release date in Header', () => {

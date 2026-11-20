@@ -3,6 +3,11 @@
   import { DEFENSES } from '../../data/defenses';
   import SpellBadge from '../ui/SpellBadge.svelte';
   import EquipmentBadge from '../ui/EquipmentBadge.svelte';
+  import {
+    getDefenseImageSrc,
+    getResponsiveSrcSet,
+    handleDefenseImageError,
+  } from '../../lib/images';
 
   const defenseId = $derived(calcState.selectedDefenseId);
   const defense = $derived(defenseId ? DEFENSES[defenseId] : null);
@@ -35,16 +40,8 @@
       : maxLevel
   );
 
-  const imageLevel = $derived(
-    defense && defense.superchargeLevel && currentLevel >= defense.superchargeLevel
-      ? defense.superchargeLevel - 1
-      : currentLevel
-  );
-
   const heroOrBuildingImg = $derived(
-    defense?.type === 'hero'
-      ? (defense.icon || `/images/defense/${defense.id}/1.webp`)
-      : `/images/defense/${defense?.id}/${imageLevel}.webp`
+    defense ? getDefenseImageSrc(defense, currentLevel) : '/images/other/defense.webp'
   );
 
   function handleLevelChange(e: Event) {
@@ -106,19 +103,13 @@
               <div class="w-12 h-12 bg-slate-900 rounded-lg border border-slate-800 p-1 flex items-center justify-center shrink-0">
                 <img
                   src={heroOrBuildingImg}
+                  srcset={getResponsiveSrcSet(heroOrBuildingImg)}
                   alt="{defense.name} Level {displayLevel}"
                   width="48"
                   height="48"
                   class="w-full h-full aspect-square object-contain drop-shadow"
-                  onerror={(e) => {
-                    const img = e.currentTarget as HTMLImageElement;
-                    if (!img.src.endsWith('/1.webp')) {
-                      img.src = `/images/defense/${defense.id}/1.webp`;
-                    } else {
-                      img.onerror = null;
-                      img.src = '/images/other/defense.webp';
-                    }
-                  }}
+                  decoding="async"
+                  onerror={(e) => handleDefenseImageError(e, defense.id)}
                 />
               </div>
 

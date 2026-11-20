@@ -1126,7 +1126,15 @@ export const DEFENSES: Record<string, DefenseData> = {
       4900
     ],
     "immune": [],
-    "icon": "/images/defense/hero_bell/1.webp"
+    "icon": "/images/defense/hero_bell/1.webp",
+    "spriteLevelMap": {
+      "2": 1,
+      "3": 1,
+      "5": 4,
+      "6": 4,
+      "8": 7,
+      "9": 7
+    }
   },
   "light_beam": {
     "id": "light_beam",
@@ -1146,7 +1154,15 @@ export const DEFENSES: Record<string, DefenseData> = {
       6000
     ],
     "immune": [],
-    "icon": "/images/defense/light_beam/1.webp"
+    "icon": "/images/defense/light_beam/1.webp",
+    "spriteLevelMap": {
+      "2": 1,
+      "3": 1,
+      "5": 4,
+      "6": 4,
+      "8": 7,
+      "9": 7
+    }
   },
   "bomb_hive": {
     "id": "bomb_hive",
@@ -1166,6 +1182,14 @@ export const DEFENSES: Record<string, DefenseData> = {
       4900
     ],
     "immune": [],
-    "icon": "/images/defense/bomb_hive/1.webp"
+    "icon": "/images/defense/bomb_hive/1.webp",
+    "spriteLevelMap": {
+      "2": 1,
+      "3": 1,
+      "5": 4,
+      "6": 4,
+      "8": 7,
+      "9": 7
+    }
   }
 };

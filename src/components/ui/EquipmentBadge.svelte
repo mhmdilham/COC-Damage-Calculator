@@ -1,5 +1,6 @@
 <script lang="ts">
   import { EQUIPMENTS } from '../../data/offenses';
+  import { getResponsiveSrcSet } from '../../lib/images';
 
   interface Props {
     equipmentId: string;
@@ -19,6 +20,8 @@
       : 'w-11 h-11'
   );
 
+  const imgPx = $derived(size === 'sm' ? 36 : size === 'lg' ? 56 : 44);
+
   const levelBadgeClasses = $derived(
     size === 'sm'
       ? 'text-[8px] px-1 py-0'
@@ -36,9 +39,10 @@
     <!-- Equipment Icon -->
     <img
       src={eq.icon}
+      srcset={getResponsiveSrcSet(eq.icon)}
       alt={eq.name}
-      width="44"
-      height="44"
+      width={imgPx}
+      height={imgPx}
       class="w-full h-full aspect-square object-contain p-1"
       decoding="async"
     />

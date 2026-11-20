@@ -3,6 +3,13 @@
   import type { DefenseData, ActiveEquipmentConfig, TownHallLevel } from '../../engine/types';
   import SpellBadge from '../ui/SpellBadge.svelte';
   import EquipmentBadge from '../ui/EquipmentBadge.svelte';
+  import {
+    getDefenseImageSrc,
+    getResponsiveSrcSet,
+    getTownHallIconSrc,
+    handleDefenseImageError,
+    handleTownHallImageError,
+  } from '../../lib/images';
 
   const thLevelsDescending: TownHallLevel[] = [
     19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1,
@@ -128,8 +135,7 @@
       const best = calcState.getBestComboFor(def, level);
       const isSupercharge = !!(def.superchargeLevel && level === def.superchargeLevel);
       const displayLevel = isSupercharge ? level - 1 : level;
-      const imageLevel = def.superchargeLevel && level >= def.superchargeLevel ? def.superchargeLevel - 1 : level;
-      const imgSrc = def.type === 'hero' ? (def.icon || `/images/defense/${def.id}/1.webp`) : `/images/defense/${def.id}/${imageLevel}.webp`;
+      const imgSrc = getDefenseImageSrc(def, level);
 
       const item: ComboDefenseItem = {
         def,
@@ -210,16 +216,13 @@
           title="Atur level maksimal pertahanan & HP sesuai TH musuh"
         >
           <img
-            src="/images/defense/townhall/{calcState.targetThLevel}.webp"
+            src={getTownHallIconSrc(calcState.targetThLevel, 'sm')}
             alt="TH {calcState.targetThLevel}"
             width="20"
             height="20"
             class="w-5 h-5 aspect-square object-contain drop-shadow"
-            onerror={(e) => {
-              const img = e.currentTarget as HTMLImageElement;
-              img.onerror = null;
-              img.src = '/images/defense/townhall/18.webp';
-            }}
+            decoding="async"
+            onerror={(e) => handleTownHallImageError(e, 'sm')}
           />
           <span class="text-sm font-extrabold text-white tracking-tight leading-none">
             TH {calcState.targetThLevel}
@@ -233,7 +236,7 @@
           <div
             class="absolute right-0 top-full mt-1.5 z-50 w-[130px] max-h-64 overflow-y-auto bg-[#1f2127] border border-white/10 rounded-xl shadow-2xl p-1 space-y-0.5 scrollbar-thin"
           >
-            {#each thLevelsDescending as th (th)}
+            {#each thLevelsDescending as th, thIdx (th)}
               <button
                 type="button"
                 onclick={() => selectDefenderTH(th)}
@@ -242,16 +245,14 @@
                   : 'text-slate-300 hover:text-white hover:bg-[#282a32]'}"
               >
                 <img
-                  src="/images/defense/townhall/{th}.webp"
+                  src={getTownHallIconSrc(th, 'sm')}
                   alt="TH {th}"
                   width="18"
                   height="18"
                   class="w-[18px] h-[18px] aspect-square object-contain drop-shadow shrink-0"
-                  onerror={(e) => {
-                    const img = e.currentTarget as HTMLImageElement;
-                    img.onerror = null;
-                    img.src = '/images/defense/townhall/18.webp';
-                  }}
+                  loading={thIdx < 8 ? 'eager' : 'lazy'}
+                  decoding="async"
+                  onerror={(e) => handleTownHallImageError(e, 'sm')}
                 />
                 <span class="text-xs font-bold whitespace-nowrap">
                   Town Hall {th}
@@ -326,7 +327,7 @@
   {#if calcState.activeCategory === 'combo'}
     <!-- Group By Combo View (Clashify Style) -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
-      {#each comboGroups as group (group.key)}
+      {#each comboGroups as group, groupIdx (group.key)}
         <div class="bg-[#181a20] border border-slate-800/90 hover:border-slate-700/80 rounded-2xl p-4 flex flex-col justify-between shadow-sm transition-all min-h-[160px]">
           <!-- Combo Recipe Header -->
           <div class="flex items-center justify-center gap-2 flex-wrap pb-3.5 border-b border-slate-800/70 min-h-[58px]">
@@ -369,20 +370,14 @@
               >
                 <img
                   src={item.imgSrc}
+                  srcset={getResponsiveSrcSet(item.imgSrc)}
                   alt="{item.def.name} Level {item.displayLevel}"
                   width="40"
                   height="40"
                   class="w-9 h-9 sm:w-10 sm:h-10 aspect-square object-contain drop-shadow transition-transform group-hover:scale-110"
+                  loading={groupIdx < 3 ? 'eager' : 'lazy'}
                   decoding="async"
-                  onerror={(e) => {
-                    const img = e.currentTarget as HTMLImageElement;
-                    if (!img.src.endsWith('/1.webp')) {
-                      img.src = `/images/defense/${item.def.id}/1.webp`;
-                    } else {
-                      img.onerror = null;
-                      img.src = '/images/other/defense.webp';
-                    }
-                  }}
+                  onerror={(e) => handleDefenseImageError(e, item.def.id)}
                 />
               </button>
             {/each}
@@ -413,20 +408,14 @@
               >
                 <img
                   src={item.imgSrc}
+                  srcset={getResponsiveSrcSet(item.imgSrc)}
                   alt="{item.def.name} Level {item.displayLevel}"
                   width="40"
                   height="40"
                   class="w-9 h-9 sm:w-10 sm:h-10 aspect-square object-contain grayscale-[25%] group-hover:grayscale-0 drop-shadow transition-transform group-hover:scale-110"
+                  loading="lazy"
                   decoding="async"
-                  onerror={(e) => {
-                    const img = e.currentTarget as HTMLImageElement;
-                    if (!img.src.endsWith('/1.webp')) {
-                      img.src = `/images/defense/${item.def.id}/1.webp`;
-                    } else {
-                      img.onerror = null;
-                      img.src = '/images/other/defense.webp';
-                    }
-                  }}
+                  onerror={(e) => handleDefenseImageError(e, item.def.id)}
                 />
               </button>
             {/each}
@@ -437,14 +426,13 @@
   {:else}
     <!-- All & Key Defenses Grid View -->
     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-      {#each filteredDefenses as def (def.id)}
+      {#each filteredDefenses as def, defIdx (def.id)}
         {@const level = calcState.defenseLevels[def.id] ?? 1}
         {@const maxHp = def.hp[level - 1] ?? def.hp[0]}
         {@const best = calcState.getBestComboFor(def, level)}
         {@const isSupercharge = def.superchargeLevel && level === def.superchargeLevel}
         {@const displayLevel = isSupercharge ? level - 1 : level}
-        {@const imageLevel = def.superchargeLevel && level >= def.superchargeLevel ? def.superchargeLevel - 1 : level}
-        {@const imgSrc = def.type === 'hero' ? (def.icon || `/images/defense/${def.id}/1.webp`) : `/images/defense/${def.id}/${imageLevel}.webp`}
+        {@const imgSrc = getDefenseImageSrc(def, level)}
 
         <button
           type="button"
@@ -492,20 +480,14 @@
           <div class="w-14 h-14 flex items-center justify-center my-1">
             <img
               src={imgSrc}
+              srcset={getResponsiveSrcSet(imgSrc)}
               alt="{def.name} Level {displayLevel}"
               width="56"
               height="56"
               class="w-14 h-14 aspect-square object-contain drop-shadow transition-transform group-hover:scale-105"
+              loading={defIdx < 8 ? 'eager' : 'lazy'}
               decoding="async"
-              onerror={(e) => {
-                const img = e.currentTarget as HTMLImageElement;
-                if (!img.src.endsWith('/1.webp')) {
-                  img.src = `/images/defense/${def.id}/1.webp`;
-                } else {
-                  img.onerror = null;
-                  img.src = '/images/other/defense.webp';
-                }
-              }}
+              onerror={(e) => handleDefenseImageError(e, def.id)}
             />
           </div>
 
