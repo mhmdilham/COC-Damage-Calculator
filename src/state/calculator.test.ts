@@ -4,6 +4,7 @@ import { calcState } from './calculator.svelte';
 import { DEFENSES } from '../data/defenses';
 import DamageSourcesBar from '../components/offense/DamageSourcesBar.svelte';
 import DefenseGrid from '../components/defense/DefenseGrid.svelte';
+import Header from '../components/layout/Header.svelte';
 
 describe('CalculatorState and TH 19 UI integration', () => {
   const originalWindow = globalThis.window;
@@ -220,5 +221,11 @@ describe('CalculatorState and TH 19 UI integration', () => {
     expect(body).toContain('Firecracker Tower');
     expect(body).toContain('Spiky Tower');
     expect(body).toMatch(/<img[^>]*alt="TH 19"[^>]*onerror=/);
+  });
+
+  it('displays official Supercell TH 19 patch version and release date in Header', () => {
+    const { body } = render(Header);
+    expect(body).toContain('v19.32.4');
+    expect(body).toContain('16 Nov 2026');
   });
 });

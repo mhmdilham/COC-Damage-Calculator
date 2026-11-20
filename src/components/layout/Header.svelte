@@ -1,13 +1,24 @@
 <header class="bg-[#121316]/95 backdrop-blur border-b border-slate-800 sticky top-0 z-30 shadow-md">
   <div class="max-w-6xl w-full mx-auto px-3 sm:px-5 py-3 flex items-center justify-between">
     <!-- Brand -->
-    <div class="flex items-center gap-2.5">
-      <div class="w-8 h-8 rounded-xl bg-orange-500/20 border border-orange-500/30 flex items-center justify-center text-lg shadow-sm">
+    <div class="flex items-center gap-2.5 min-w-0">
+      <div class="w-8 h-8 rounded-xl bg-orange-500/20 border border-orange-500/30 flex items-center justify-center text-lg shadow-sm shrink-0">
         ⚡
       </div>
-      <h1 class="text-base font-extrabold tracking-tight text-white">
-        COC Damage Calculator
-      </h1>
+      <div class="flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-2 min-w-0">
+        <h1 class="text-base font-extrabold tracking-tight text-white truncate leading-tight">
+          COC Damage Calculator
+        </h1>
+        <span
+          class="inline-flex items-center gap-1 w-fit text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 tracking-tight whitespace-nowrap"
+          title="Clash of Clans: The Clash of Titans (Town Hall 19) — Official Supercell Patch v19.32.4 (16 November 2026)"
+        >
+          <span>TH 19</span>
+          <span class="text-amber-500/70">&bull;</span>
+          <span>v19.32.4</span>
+          <span class="hidden md:inline text-amber-400/80 font-medium">(16 Nov 2026)</span>
+        </span>
+      </div>
     </div>
 
     <!-- GitHub Icon Button (Minimal & Modern) -->

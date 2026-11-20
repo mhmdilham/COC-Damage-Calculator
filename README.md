@@ -1,6 +1,8 @@
 # ⚡ Clash of Clans Damage Calculator
 
-A modern, fast, and offline-ready web application designed to calculate the optimal combination of **Lightning Spells (Zap)**, **Earthquake Spells (Quake)**, and **Hero Equipments** required to take down any defense building or defending hero in **Clash of Clans (Town Hall 1 – 18)**.
+A modern, fast, and offline-ready web application designed to calculate the optimal combination of **Lightning Spells (Zap)**, **Earthquake Spells (Quake)**, and **Hero Equipments** required to take down any defense building or defending hero in **Clash of Clans (Town Hall 1 – 19)**.
+
+> **Game Data Version:** Clash of Clans — **The Clash of Titans (Town Hall 19)** • Official Patch **`v19.32.4`** (Released **November 16, 2026**)
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
 [![Svelte](https://img.shields.io/badge/Svelte-5-orange?logo=svelte)](https://svelte.dev/)
@@ -14,9 +16,10 @@ A modern, fast, and offline-ready web application designed to calculate the opti
 
 - **⚡ ZapQuake Math Engine**: Accurately calculates flat Lightning spell damage and diminishing returns for percentage-based Earthquake spells.
 - **👑 Hero Equipment Integration**: Combine spell damage with high-impact Hero Equipments (Spiky Ball, Giant Arrow, Fireball, Seeking Shield, Rocket Backpack, Flame Blower) to save valuable spell housing slots.
-- **🛡️ Full Town Hall Support (TH 1 – 18)**:
-  - Defenses automatically scale to the selected Enemy Town Hall level (including **Supercharge** tiers).
-  - Attacker presets dynamically calibrate maximum allowed spell and equipment levels according to Attacker Town Hall level.
+- **🛡️ Full Town Hall Support (TH 1 – 19)**:
+  - Defenses automatically scale to the selected Enemy Town Hall level (including TH 19 **Spiky Tower**, **Firecracker Tower**, **Supercharge** tiers, and all 6 Heroes).
+  - Attacker presets dynamically calibrate maximum allowed spell (Lightning up to Lv 14) and equipment levels according to Attacker Town Hall level.
+  - Toggle **Lightning (Zap)**, **Earthquake (Quake)**, and **Hero Equipments** ON/OFF individually while preserving their configured levels.
 - **🎯 Interactive Combo Breakdown Modal**: Inspect individual damage steps, sequence of execution, leftover HP, and all alternative spell combinations for every defense.
 - **📱 PWA & 100% Offline Capable**: Pure client-side calculations with local caching. Installable as a Progressive Web App (PWA) on iOS, Android, and Desktop.
 - **⚡ Built on Svelte 5**: Powered by the latest Svelte 5 Runes for fine-grained reactivity, lightning-fast rendering, and lightweight bundle footprint.
