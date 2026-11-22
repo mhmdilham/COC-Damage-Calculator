@@ -3,6 +3,7 @@
   import DamageSourcesBar from './components/offense/DamageSourcesBar.svelte';
   import DefenseGrid from './components/defense/DefenseGrid.svelte';
   import DefenseModal from './components/modal/DefenseModal.svelte';
+  import SeoGuideSection from './components/seo/SeoGuideSection.svelte';
 </script>
 
 <div class="min-h-screen bg-[#111317] text-slate-100 flex flex-col font-sans selection:bg-orange-500 selection:text-slate-950">
@@ -14,6 +15,9 @@
 
     <!-- Target Base Defenses & Combos (with Target TH Selector) -->
     <DefenseGrid />
+
+    <!-- Concise SEO Overview & FAQ -->
+    <SeoGuideSection />
   </main>
 
   <!-- Detail / Available Combos Modal (Replicating Clashify Modal) -->
