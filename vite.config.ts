@@ -14,6 +14,7 @@ export default defineConfig({
       // Defense sprites are cached on demand via CacheFirst runtimeCaching below.
       includeAssets: ['favicon.ico', 'images/offense/**/*', 'images/other/defense*.webp'],
       workbox: {
+        navigateFallbackDenylist: [/^\/robots\.txt$/, /^\/sitemap\.xml$/, /^\/google[a-z0-9]+\.html$/],
         runtimeCaching: [
           {
             urlPattern: ({ url }) => url.pathname.startsWith('/images/defense/'),
@@ -46,9 +47,9 @@ export default defineConfig({
         ],
       },
       manifest: {
-        name: 'CoC Damage Calculator',
+        name: 'CoC Damage & ZapQuake Calculator',
         short_name: 'CoC Calc',
-        description: 'Clash of Clans ZapQuake & Hero Equipment Damage Calculator (Patch v19.32.4 - 16 Nov 2026)',
+        description: 'Clash of Clans (CoC) Damage & ZapQuake Calculator for Lightning, Earthquake & Hero Equipment/Gear (Patch v19.32.4)',
         theme_color: '#020617',
         background_color: '#020617',
         display: 'standalone',
@@ -58,6 +59,16 @@ export default defineConfig({
             src: 'favicon.ico',
             sizes: '64x64 32x32 24x24 16x16',
             type: 'image/x-icon'
+          },
+          {
+            src: 'images/favicon/android-chrome-192x192.png',
+            sizes: '192x192',
+            type: 'image/png'
+          },
+          {
+            src: 'images/favicon/android-chrome-256x256.png',
+            sizes: '256x256',
+            type: 'image/png'
           }
         ]
       }

@@ -1,10 +1,12 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { render } from 'svelte/server';
-import { calcState } from './calculator.svelte';
+import { calcState, hasCalculatorUrlParams } from './calculator.svelte';
 import { DEFENSES } from '../data/defenses';
+import { buildZapQuakeReferenceRows, buildTh19Highlights } from '../data/zapquakeReference';
 import DamageSourcesBar from '../components/offense/DamageSourcesBar.svelte';
 import DefenseGrid from '../components/defense/DefenseGrid.svelte';
 import Header from '../components/layout/Header.svelte';
+import SeoGuideSection from '../components/seo/SeoGuideSection.svelte';
 
 describe('CalculatorState and TH 19 UI integration', () => {
   const originalWindow = globalThis.window;
@@ -46,6 +48,9 @@ describe('CalculatorState and TH 19 UI integration', () => {
     calcState.setAttackerTH(18);
     calcState.zapEnabled = true;
     calcState.eqEnabled = true;
+    for (const eq of Object.values(calcState.equipments)) {
+      eq.enabled = false;
+    }
     calcState.activeCategory = 'all';
     calcState.searchQuery = '';
     store = {};
@@ -231,5 +236,53 @@ describe('CalculatorState and TH 19 UI integration', () => {
     const { body } = render(Header);
     expect(body).toContain('v19.32.4');
     expect(body).toContain('16 Nov 2026');
+    expect(body).toContain('ZapQuake');
+  });
+
+  it('parses and serializes shareable URL query parameters with level clamping', () => {
+    expect(hasCalculatorUrlParams('')).toBe(false);
+    expect(hasCalculatorUrlParams('?utm_source=reddit')).toBe(false);
+    expect(hasCalculatorUrlParams('?atk=16&target=17')).toBe(true);
+
+    const applied = calcState.applyUrlParams('?atk=16&target=17&zap=0&eq=5&gear=fireball:99,giant_arrow:15');
+    expect(applied).toBe(true);
+    expect(calcState.attackerThLevel).toBe(16);
+    expect(calcState.targetThLevel).toBe(17);
+    expect(calcState.zapEnabled).toBe(false);
+    expect(calcState.eqEnabled).toBe(true);
+    expect(calcState.eqLevel).toBe(5);
+    expect(calcState.equipments.fireball.enabled).toBe(true);
+    expect(calcState.equipments.fireball.level).toBe(27); // clamped to maxLevel
+    expect(calcState.equipments.giant_arrow.enabled).toBe(true);
+    expect(calcState.equipments.giant_arrow.level).toBe(15);
+    expect(calcState.equipments.spiky_ball.enabled).toBe(false);
+
+    const shareUrl = calcState.getShareUrl();
+    expect(shareUrl).toContain('atk=16');
+    expect(shareUrl).toContain('target=17');
+    expect(shareUrl).toContain('zap=0');
+    expect(shareUrl).toContain('eq=5');
+    expect(shareUrl).toContain('gear=giant_arrow%3A15%2Cfireball%3A27');
+
+    // Default state yields clean root URL with no query string
+    calcState.applyUrlParams('?atk=19&target=19&zap=14&eq=5&gear=none');
+    expect(calcState.getShareSearchString()).toBe('');
+  });
+
+  it('builds accurate Quick ZapQuake Reference rows and renders SeoGuideSection', () => {
+    const rows = buildZapQuakeReferenceRows();
+    const th19 = rows.find((r) => r.th === 19)!;
+    expect(th19.zapLevel).toBe(14);
+    expect(th19.eqLevel).toBe(5);
+    expect(th19.cells.air_defense?.comboText).toBe('3 Zap');
+    expect(th19.cells.monolith?.comboText).toBe('5 Zap + 2 Quake');
+
+    const highlights = buildTh19Highlights();
+    expect(highlights.map((h) => h.id)).toContain('spiky_tower');
+
+    const { body } = render(SeoGuideSection);
+    expect(body).toContain('Quick ZapQuake Reference');
+    expect(body).toContain('3 Zap');
+    expect(body).toContain('Does Giant Arrow one-shot Air Defense');
   });
 });
