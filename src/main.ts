@@ -1,6 +1,7 @@
 import { hydrate, mount } from 'svelte';
 import './app.css';
 import App from './App.svelte';
+import { hasCalculatorUrlParams } from './state/calculator.svelte';
 
 const target = document.getElementById('app')!;
 
@@ -13,11 +14,12 @@ function getHasSavedPrefs(): boolean {
 }
 
 const hasSavedPrefs = getHasSavedPrefs();
+const hasUrlParams = hasCalculatorUrlParams(window.location.search);
 
 const isPrerendered = target.hasChildNodes();
 
 let app: ReturnType<typeof mount>;
-if (isPrerendered && !hasSavedPrefs) {
+if (isPrerendered && !hasSavedPrefs && !hasUrlParams) {
   app = hydrate(App, { target });
 } else {
   if (isPrerendered) {

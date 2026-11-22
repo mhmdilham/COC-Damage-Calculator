@@ -1,11 +1,27 @@
+import { SvelteURLSearchParams } from 'svelte/reactivity';
 import { DEFENSES } from '../data/defenses';
-import { SPELLS } from '../data/offenses';
+import { SPELLS, EQUIPMENTS } from '../data/offenses';
 import { getMaxBuildingLevel } from '../data/thBuildingMaxLevels';
 import { TH_ATTACKER_MAX_LEVELS } from '../data/thAttackerMaxLevels';
 import { calculateCombos } from '../engine/calculator';
 import type { TownHallLevel, ActiveEquipmentConfig, ComboResult, DefenseData } from '../engine/types';
 
 const STORAGE_SCHEMA_VERSION = 3;
+const DEFAULT_TH_LEVEL: TownHallLevel = 19;
+const URL_PARAM_KEYS = ['atk', 'target', 'zap', 'eq', 'gear'] as const;
+
+export function hasCalculatorUrlParams(search: string): boolean {
+  if (!search) return false;
+  const params = new SvelteURLSearchParams(search);
+  return URL_PARAM_KEYS.some((key) => params.has(key));
+}
+
+function parseTownHallParam(raw: string | null): TownHallLevel | null {
+  if (!raw) return null;
+  const num = Number(raw);
+  if (!Number.isInteger(num) || num < 1 || num > 19) return null;
+  return num as TownHallLevel;
+}
 const TH19_PROMOTED_FROM_SUPERCHARGE = [
   'ricochet_cannon',
   'multiarcher_tower',
@@ -17,10 +33,10 @@ const TH19_PROMOTED_FROM_SUPERCHARGE = [
 
 class CalculatorState {
   // Target Village Town Hall Level (sets all defenses to max for this TH)
-  targetThLevel = $state<TownHallLevel>(16);
+  targetThLevel = $state<TownHallLevel>(DEFAULT_TH_LEVEL);
 
   // Attacker Town Hall Level (sets spells & equipment to max for this TH)
-  attackerThLevel = $state<TownHallLevel>(19);
+  attackerThLevel = $state<TownHallLevel>(DEFAULT_TH_LEVEL);
 
   // Modal inspection: which defense is currently opened in modal
   selectedDefenseId = $state<string | null>(null);
@@ -51,6 +67,7 @@ class CalculatorState {
   constructor() {
     this.initDefenseLevels(this.targetThLevel);
     this.loadFromStorage();
+    this.loadFromUrl();
   }
 
   // Initialize or re-apply all defense levels to max of selected target TH
@@ -71,8 +88,8 @@ class CalculatorState {
     this.saveToStorage();
   }
 
-  // Set Attacker Town Hall: immediately sets Zap, Quake, and Hero Equipment to their max levels at that TH
-  setAttackerTH(th: TownHallLevel) {
+  // Apply Attacker Town Hall preset levels without persisting
+  private applyAttackerPreset(th: TownHallLevel) {
     this.attackerThLevel = th;
     const maxData = TH_ATTACKER_MAX_LEVELS[th];
     if (maxData) {
@@ -100,6 +117,11 @@ class CalculatorState {
         }
       }
     }
+  }
+
+  // Set Attacker Town Hall: immediately sets Zap, Quake, and Hero Equipment to their max levels at that TH
+  setAttackerTH(th: TownHallLevel) {
+    this.applyAttackerPreset(th);
     this.saveToStorage();
   }
 
@@ -185,6 +207,134 @@ class CalculatorState {
     } catch {
       // ignore storage errors
     }
+    this.syncUrl();
+  }
+
+  getShareSearchString(): string {
+    const defaultAtk = TH_ATTACKER_MAX_LEVELS[DEFAULT_TH_LEVEL];
+    const activeGear = this.enabledEquipments;
+    const isDefaultState =
+      this.attackerThLevel === DEFAULT_TH_LEVEL &&
+      this.targetThLevel === DEFAULT_TH_LEVEL &&
+      this.zapEnabled &&
+      this.zapLevel === defaultAtk.zapLevel &&
+      this.eqEnabled &&
+      this.eqLevel === defaultAtk.eqLevel &&
+      activeGear.length === 0;
+
+    if (isDefaultState) {
+      return '';
+    }
+
+    const params = new SvelteURLSearchParams();
+    params.set('atk', String(this.attackerThLevel));
+    params.set('target', String(this.targetThLevel));
+    params.set('zap', this.zapEnabled ? String(this.zapLevel) : '0');
+    params.set('eq', this.eqEnabled ? String(this.eqLevel) : '0');
+
+    if (activeGear.length > 0) {
+      params.set(
+        'gear',
+        activeGear.map((g) => `${g.id}:${g.level}`).join(',')
+      );
+    }
+
+    return `?${params.toString()}`;
+  }
+
+  getShareUrl(): string {
+    const query = this.getShareSearchString();
+    if (typeof window !== 'undefined' && window.location?.origin) {
+      return `${window.location.origin}${window.location.pathname}${query}`;
+    }
+    return `https://coccalculator.netlify.app/${query}`;
+  }
+
+  syncUrl() {
+    if (
+      typeof window === 'undefined' ||
+      !window.location ||
+      typeof window.history?.replaceState !== 'function'
+    ) {
+      return;
+    }
+    const nextUrl = `${window.location.pathname}${this.getShareSearchString()}${window.location.hash ?? ''}`;
+    const currentUrl = `${window.location.pathname}${window.location.search}${window.location.hash ?? ''}`;
+    if (nextUrl !== currentUrl) {
+      window.history.replaceState(null, '', nextUrl);
+    }
+  }
+
+  applyUrlParams(search: string): boolean {
+    if (!hasCalculatorUrlParams(search)) return false;
+    const params = new SvelteURLSearchParams(search);
+
+    const atk = parseTownHallParam(params.get('atk'));
+    if (atk !== null) {
+      this.applyAttackerPreset(atk);
+    }
+
+    const target = parseTownHallParam(params.get('target'));
+    if (target !== null) {
+      this.targetThLevel = target;
+      this.initDefenseLevels(target);
+    }
+
+    if (params.has('zap')) {
+      const rawZap = Number(params.get('zap'));
+      if (Number.isFinite(rawZap)) {
+        const rounded = Math.round(rawZap);
+        if (rounded <= 0) {
+          this.zapEnabled = false;
+        } else {
+          this.zapEnabled = true;
+          this.zapLevel = Math.min(rounded, SPELLS.lightning_spell.maxLevel);
+        }
+      }
+    }
+
+    if (params.has('eq')) {
+      const rawEq = Number(params.get('eq'));
+      if (Number.isFinite(rawEq)) {
+        const rounded = Math.round(rawEq);
+        if (rounded <= 0) {
+          this.eqEnabled = false;
+        } else {
+          this.eqEnabled = true;
+          this.eqLevel = Math.min(rounded, 5);
+        }
+      }
+    }
+
+    if (params.has('gear')) {
+      for (const eqId of Object.keys(this.equipments)) {
+        this.equipments[eqId].enabled = false;
+      }
+      const rawGear = (params.get('gear') ?? '').trim();
+      if (rawGear && rawGear.toLowerCase() !== 'none') {
+        for (const token of rawGear.split(',')) {
+          const [rawId, rawLv] = token.split(':').map((s) => s.trim());
+          const eqState = this.equipments[rawId];
+          const eqData = EQUIPMENTS[rawId];
+          if (!eqState || !eqData) continue;
+
+          eqState.enabled = true;
+          if (rawLv !== undefined && rawLv !== '') {
+            const parsedLv = Number(rawLv);
+            if (Number.isFinite(parsedLv) && parsedLv > 0) {
+              eqState.level = Math.max(1, Math.min(Math.round(parsedLv), eqData.maxLevel));
+            }
+          }
+        }
+      }
+    }
+
+    return true;
+  }
+
+  loadFromUrl() {
+    if (typeof window === 'undefined' || !window.location?.search) return;
+    this.applyUrlParams(window.location.search);
   }
 
   loadFromStorage() {
