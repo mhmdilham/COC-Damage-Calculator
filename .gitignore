@@ -20,8 +20,8 @@ test-results/
 
 # Environment Variables & Secrets
 .env
-.env.local
-.env.*.local
+.env.*
+!.env.example
 *.local
 
 # Logs
@@ -42,8 +42,10 @@ lerna-debug.log*
 *.sln
 *.sw?
 
-# AI Agent & Skills Metadata
+# AI Agent, Skills & Planning
 .agents/
+.superpowers/
+docs/superpowers/
 skills-lock.json
 
 # OS Generated Files
@@ -59,6 +61,3 @@ Thumbs.db
 # Bundle Analysis Reports (Visualizer)
 bundle-report.html
 stats.html
-
-# Superpowers
-.superpowers/
